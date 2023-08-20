@@ -1,0 +1,36 @@
+
+
+.gdbar img {
+  width: 300px !important;
+  height: 150px !important;
+  margin: 100px 50px;
+}
+
+.gdbar {
+  width: 400px !important;
+  height: 170px !important;
+}
+
+slides > slide:not(.nobackground):before {
+  width: 150px;
+  height: 75px;
+  background-size: 150px 75px;
+}
+
+h2{
+padding-bottom:1px;
+margin:1px;
+margin-bottom:10px;
+}
+
+.plot-container {
+  display: flex;
+  justify-content: center;
+}
+
+p {
+font-size: 18px;
+margin:1px;
+margin-bottom:0px;
+margin-top:0px;
+}

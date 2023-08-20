@@ -1,0 +1,34 @@
+Package: ProteomicsTools
+Type: Package
+Title: Analysis Tools for Proteomics Experiments
+Version: 0.6.4
+Author: David Nathan Ohayon
+Maintainer: The package maintainer <david.ohayon@etu.unige.ch>
+Description: Functions to analyze Log2 Portein Abundances
+    MDS Plot
+    Pairwise t-test
+    Venn Diagrams
+    Fisher Exact Tests
+    Enrichment analysis
+    Mean and FoldChanges
+    VolcanoPlots
+    Table Formatting to transform numeric p-values into logical (T/F)
+    HeatMaps
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Depends:
+  BiocManager (>= 0.46.0),
+  ggplot2 (>= 3.4.2),
+  ggvenn (>= 0.1.10),
+  reshape2 (>= 1.4.4),
+  rlang (>= 1.1.1),
+  stats,
+  tidyr (>= 1.3.0),
+  ComplexHeatmap (>= 2.16.0),
+  limma (>= 3.56.1),
+  edgeR (>= 3.42.2)
+Remotes:
+  BiocManager::ComplexHeatmap, BiocManager::limma, BiocManager::edgeR
+VignetteBuilder: knitr, rmarkdown
