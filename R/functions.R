@@ -289,7 +289,7 @@ fisher_dotplot <- function(ftest, path="examples/") {
     ggplot2::geom_point() +
     ggplot2::scale_color_gradient(low="red", high="blue") +
     ggplot2::theme_classic() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle=90, vjust = 0.5, hjust=1)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
     ggplot2::xlab("Pairs of Methods") +
     ggplot2::ylab("Mined Properties") +
     ggplot2::ggtitle("DotPlot [Enrichment Results]")
