@@ -1,7 +1,7 @@
 #' get canonical SwissProt ID
 #'
-#' @param gene_name
-#' @param organism
+#' @param gene_name gene name to transform
+#' @param organism taxonomy ID
 #' @param reviewed (True/False)
 #'
 #' @return Canonical SwissProtID
@@ -29,7 +29,7 @@ get_swissprot_id <- function(gene_name, organism=9606, reviewed="true") {
 #' @return Isoelectric Point
 #' @export
 #' @import httr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @examples get_nextprot_PI("P01023")
 get_nextprot_PI <- function(protname) {
   # Nextprot API endpoint and ProteinID
@@ -54,7 +54,7 @@ get_nextprot_PI <- function(protname) {
 #' @return Mass (Da)
 #' @export
 #' @import httr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @examples get_nextprot_mass("P01023")
 get_nextprot_mass <- function(protname) {
   # Nextprot API endpoint and ProteinID
@@ -72,14 +72,14 @@ get_nextprot_mass <- function(protname) {
   } else {return(paste0("Error: ", response$status_code))}
 }
 
-#' Get number of TM domains
+#' get number of TM domains
 #'
 #' @param protein name
 #'
 #' @return number of TM domains
 #' @export
 #' @import httr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @examples get_nextprot_transmembrane("Q9NRK6")
 get_nextprot_transmembrane <- function(protname) {
   # Nextprot API endpoint and ProteinID
@@ -104,7 +104,7 @@ get_nextprot_transmembrane <- function(protname) {
 #' @return subcellular location(s) in strings
 #' @export
 #' @import httr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @examples get_nextprot_subcell("P01023")
 get_nextprot_subcell <- function(protname) {
   # Nextprot API endpoint and ProteinID
@@ -151,7 +151,7 @@ subcell_table_maker <- function(df) {
 #' @return the type of glycosylation in strings or vector if few
 #' @export
 #' @import httr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @examples get_nextprot_glycosite("Q8N2K0")
 get_nextprot_glycosite <- function(protname) {
   # Nextprot API endpoint and ProteinID

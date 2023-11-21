@@ -9,7 +9,7 @@ heatmap_maker(num_df, scale_data = TRUE)
 \arguments{
 \item{num_df}{A df with numeric values}
 
-\item{scale_data}{A logical parameter scaling your data or not.}
+\item{scale_data}{A logical parameter scaling your data or not. Note that data should be scaled.}
 }
 \value{
 Heatmap of your methods

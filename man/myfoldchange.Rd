@@ -4,7 +4,7 @@
 \alias{myfoldchange}
 \title{Makes foldchange around your methods}
 \usage{
-myfoldchange(long_df)
+myfoldchange(df)
 }
 \arguments{
 \item{long_df}{Melted data.frame with replicates_factor()}
@@ -17,5 +17,5 @@ Makes foldchange around your methods
 }
 \examples{
 data("log2")
-myfoldchange(replicates_factor(log2))
+myfoldchange(mean_function(replicates_factor(log2)))
 }

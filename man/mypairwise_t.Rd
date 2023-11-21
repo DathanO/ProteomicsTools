@@ -7,9 +7,9 @@
 mypairwise_t(long_df, padj = "none")
 }
 \arguments{
-\item{long_df}{A data.frame that is melted. You can use replicates_factor() below}
+\item{long_df}{A data.frame that is melted. You can use replicates_factor()}
 
-\item{padj}{A string parameter defining the correction methods. See p.adjust()}
+\item{padj}{A string parameter defining the correction methods. See ?p.adjust}
 }
 \value{
 A table of pairwise t.test of 2 times your amount of methods

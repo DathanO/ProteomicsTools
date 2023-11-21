@@ -4,12 +4,12 @@
 \alias{volcano_all}
 \title{Compare your volcano plots together}
 \usage{
-volcano_all(ttest, foldc, big, binarycol, threshold = 5, path = "")
+volcano_all(ttest, foldc, big, binarycol, threshold = 5, path = "examples/")
 }
 \arguments{
-\item{ttest}{output of my_pairwiset}
+\item{ttest}{output of mypairwise_t}
 
-\item{foldc}{output of my_foldchange}
+\item{foldc}{output of myfoldchange}
 
 \item{big}{dataframe with a logical variable to highlight}
 
@@ -20,7 +20,7 @@ volcano_all(ttest, foldc, big, binarycol, threshold = 5, path = "")
 \item{path}{will define directory to store output. by default, files are saved within wd}
 }
 \value{
-Volcanoplots of your pair of methods
+Volcanoplots for each pair of methods
 }
 \description{
 Compare your volcano plots together

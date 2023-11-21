@@ -10,7 +10,7 @@ volcano_maker(
   binarydf,
   binarycol,
   threshold = 5,
-  path = ""
+  path = "examples/"
 )
 }
 \arguments{
@@ -20,11 +20,11 @@ volcano_maker(
 
 \item{binarydf}{A reformated data.frame of mined data (reformat_table(big))}
 
-\item{binarycol}{A String parameter of the column you wish to investigate}
+\item{binarycol}{A String parameter of the column you wish to highlight}
 
 \item{threshold}{should depend on the p.value adjustment, you can adapt it to your data}
 
-\item{path}{will define directory to store output. by default, files are saved within wd}
+\item{path}{will define directory to store output. by default, files are saved within working directory}
 }
 \value{
 Saves X plots of your pairs of methods, X being 2 times the amount of methods

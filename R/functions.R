@@ -164,16 +164,12 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
 #' @examples data("log2")
 #' mean_function(replicates_factor(log2))
 mean_function <- function(long_df) {
-  vectorgene <- unique(long_df$name)
-  meantable <- data.frame()
-  for (gene in vectorgene) {
-    name <- long_df[long_df$name == gene,]
-    for (method in unique(name$Method)) {
-      genemethod <- name[name$Method == method,]
-      meantable[gene, method] <- mean(genemethod$value)
-    }
-  }
-  return(meantable)
+  meanagg <- aggregate(value ~ name + Method, data = long_df, FUN = mean)
+  meandf <- reshape(meanagg, idvar="name", timevar= "Method", direction="wide")
+  names(meandf) <- gsub("value\\.", "", names(meandf))
+  rownames(meandf) <- meandf$name
+  meandf <- meandf[,-1]
+  meandf
 }
 
 #' Makes foldchange around your methods
@@ -184,23 +180,23 @@ mean_function <- function(long_df) {
 #' @export
 #'
 #' @examples data("log2")
-#' myfoldchange(replicates_factor(log2))
-myfoldchange <- function(long_df) {
-  meantable <- mean_function(long_df)
-  foldchange <- data.frame()
-  for (gene in rownames(meantable)) {
-    for (cols in 2:length(meantable)-1) {
-      for (col2 in 2:length(meantable)) {
-        if (cols != col2) {
-          if (cols < col2) {
-            colfold <- paste(colnames(meantable)[cols], colnames(meantable)[col2], sep="_vs_")
-            foldchange[gene, colfold] <- log2(meantable[gene, cols] / meantable[gene, col2])
-          }
-        }
-      }
-    }
+#' myfoldchange(mean_function(replicates_factor(log2)))
+myfoldchange <- function(df) {
+  log2fc <- function(x,y) {
+    log2(x/y)
   }
-  return(foldchange)
+  df <- melt(df)
+  method <- sort(unique(df$variable))
+  methods <- expand.grid(method, method)
+  methods <- methods[as.character(methods$Var1) > as.character(methods$Var2),]
+  colnames <- unlist(Map(paste, methods$Var1, methods$Var2, sep="_vs_"))
+  data <- Map(function(x,y) log2fc(df[df$variable == x, 'value'],
+                                   df[df$variable == y, 'value']),
+              methods$Var1, methods$Var2)
+  names(data) <- colnames
+  data <- as.data.frame(data)
+  rownames(data) <- unique(df$gene)
+  data
 }
 
 #' Automatize VolcanoPlots of your dataset
@@ -214,7 +210,7 @@ myfoldchange <- function(long_df) {
 #' @export
 #' @return Saves X plots of your pairs of methods, X being 2 times the amount of methods
 #' @import ggplot2
-#' @import rlang
+#' @importFrom rlang sym
 #'
 #' @examples data("ttest")
 #' data("foldc")
@@ -320,14 +316,14 @@ col_sorted <- function(data) {
 
 #' Compare your volcano plots together
 #'
-#' @param ttest output of my_pairwiset
-#' @param foldc output of my_foldchange
+#' @param ttest output of mypairwise_t
+#' @param foldc output of myfoldchange
 #' @param big dataframe with a logical variable to highlight
 #' @param binarycol the variable to highlight
 #' @param path will define directory to store output. by default, files are saved within wd
 #' @param threshold should depend on the p.value adjustment, you can adapt it to your data
 #' @import ggplot2
-#' @import rlang
+#' @importFrom rlang sym
 #' @return Volcanoplots for each pair of methods
 #' @export
 #'

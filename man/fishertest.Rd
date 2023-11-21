@@ -7,11 +7,11 @@
 fishertest(df_mined, ttest_logical, padj = "none")
 }
 \arguments{
-\item{df_mined}{Is a dataframe of your data.set but with biophysical properties}
-
 \item{ttest_logical}{A logical data-frame of the ouput of mypairwise_t().}
 
-\item{padj}{Correction method for your p.value. See p.adjust()}
+\item{padj}{Correction method for your p.value. See ?p.adjust}
+
+\item{df_mined_logical}{Is a dataframe of your data.set but with biophysical properties}
 }
 \value{
 A fisher table with the numbers that were used to make the f.test, and the p-value and p-adjust.

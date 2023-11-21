@@ -4,7 +4,7 @@
 \alias{myvenndiagram}
 \title{Automatize and Save VennDigram of the result of the mypairwise_t() above}
 \usage{
-myvenndiagram(output_ttest, path = "")
+myvenndiagram(output_ttest, path = "examples/")
 }
 \arguments{
 \item{path}{will define directory to store output. by default, files are saved within wd}
@@ -12,7 +12,7 @@ myvenndiagram(output_ttest, path = "")
 \item{output}{of mypairwise_t()}
 }
 \value{
-Nothing is returned, but x plots will be stored on your wd, x being the amount of methods in your dataset
+Nothing is returned, but x plots will be stored, x being the amount of methods in your dataset
 }
 \description{
 Automatize and Save VennDigram of the result of the mypairwise_t() above

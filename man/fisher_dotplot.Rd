@@ -4,7 +4,7 @@
 \alias{fisher_dotplot}
 \title{Title}
 \usage{
-fisher_dotplot(ftest, path = "")
+fisher_dotplot(ftest, path = "examples/")
 }
 \arguments{
 \item{ftest}{The output of fishertest()}
