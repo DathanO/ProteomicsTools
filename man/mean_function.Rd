@@ -4,10 +4,10 @@
 \alias{mean_function}
 \title{This function makes the mean of your replicates for each methods}
 \usage{
-mean_function(long_df)
+mean_function(df)
 }
 \arguments{
-\item{long_df}{Melted data.frame with replicates_factor()}
+\item{df}{with protein abundances}
 }
 \value{
 A data.frame of the mean of each method
@@ -17,5 +17,5 @@ This function makes the mean of your replicates for each methods
 }
 \examples{
 data("log2")
-mean_function(replicates_factor(log2))
+mean_function(log2)
 }

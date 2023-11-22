@@ -7,7 +7,7 @@
 myfoldchange(df)
 }
 \arguments{
-\item{long_df}{Melted data.frame with replicates_factor()}
+\item{df}{with protein abundances in mean. removing replicates can be done with mean_function()}
 }
 \value{
 A data.frame of the different fold.change values.
@@ -17,5 +17,5 @@ Makes foldchange around your methods
 }
 \examples{
 data("log2")
-myfoldchange(mean_function(replicates_factor(log2)))
+myfoldchange(mean_function(log2))
 }

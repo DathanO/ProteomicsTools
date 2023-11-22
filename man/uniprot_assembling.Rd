@@ -7,7 +7,7 @@
 uniprot_assembling(df)
 }
 \arguments{
-\item{df}{containing gene names}
+\item{df}{containing gene names in first column}
 }
 \value{
 df containing UniProtID

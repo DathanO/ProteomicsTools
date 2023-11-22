@@ -4,10 +4,10 @@
 \alias{mypairwise_t}
 \title{Automatize pairwise t.test of your data.}
 \usage{
-mypairwise_t(long_df, padj = "none")
+mypairwise_t(df, padj = "none")
 }
 \arguments{
-\item{long_df}{A data.frame that is melted. You can use replicates_factor()}
+\item{df}{A data.frame with protein abundances}
 
 \item{padj}{A string parameter defining the correction methods. See ?p.adjust}
 }
@@ -19,5 +19,5 @@ Automatize pairwise t.test of your data.
 }
 \examples{
 data("log2")
-mypairwise_t(replicates_factor(log2))
+mypairwise_t(log2)
 }

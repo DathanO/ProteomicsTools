@@ -125,22 +125,21 @@ get_nextprot_subcell <- function(protname) {
 
 #' Transform list of subcell locations into a wide logistic table.
 #'
-#' @param df
+#' @param df containing subcell strings after get_nextprot_subcell() with colname "SubcellStrings"
 #'
-#' @return logistic table
+#' @return logistic table of the mined strings
 #' @export
 #'
-#' @examples subcell_table_maker(dataf)
-subcell_table_maker <- function(df) {
-  table <- df
-  rownames(table) <- table$Gene
-  table <- table["SubcellStrings"]
-  SubCellLoc <- unique(unlist(table$SubcellStrings))
+#' @examples table_maker_from_strings(datamined, "SubcellStrings")
+table_maker_from_strings <- function(df, colnamestring) {
+  row_names <- df$Gene
+  table <- data.frame(matrix(ncol = 0, nrow = length(row_names)))
+  rownames(table) <- row_names
+  SubCellLoc <- unique(unlist(df[[colnamestring]]))
   for (locations in SubCellLoc) {
-    table[[locations]] <- NA
-    table[[locations]] <- sapply(table$SubcellStrings, function(x) locations %in% x)
+    table[[locations]] <- sapply(df[[colnamestring]], function(x) locations %in% x)
   }
-  table <- table[,-1]
+  table <- subset(table, select = -which(names(table) %in% c("Error: 400", "Error: 404")))
   return(table)
 }
 
@@ -173,7 +172,7 @@ get_nextprot_glycosite <- function(protname) {
 
 #' Create a table traducing gene name into canonical UniProtID
 #'
-#' @param df containing gene names
+#' @param df containing gene names in first column
 #'
 #' @return df containing UniProtID
 #' @export
