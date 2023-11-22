@@ -22,22 +22,23 @@ myMDSplot <- function(log2, rows = TRUE) {
 
 #' Automatize pairwise t.test of your data.
 #'
-#' @param long_df A data.frame that is melted. You can use replicates_factor()
+#' @param df A data.frame with protein abundances
 #' @param padj A string parameter defining the correction methods. See ?p.adjust
 #' @export
 #' @return A table of pairwise t.test of 2 times your amount of methods
 #' @import stats
 #'
 #' @examples data("log2")
-#' mypairwise_t(replicates_factor(log2))
-mypairwise_t <- function(long_df, padj="none") {
-  method <- sort(unique(long_df$Method))
+#' mypairwise_t(log2)
+mypairwise_t <- function(df, padj="none") {
+  df <- replicates_factor(df)
+  method <- sort(unique(df$Method))
   methods <- expand.grid(method, method)
   methods <- methods[as.character(methods$Var1) > as.character(methods$Var2),]
   colnames <- unlist(Map(paste, methods$Var1, methods$Var2, sep="_vs_"))
-  vectorgene <- unique(long_df$name)
+  vectorgene <- unique(df$name)
   ptt <- function(gene) {
-    aux <- long_df[long_df$name == gene,]
+    aux <- df[df$name == gene,]
     temp <- na.omit(melt(stats::pairwise.t.test(aux$value, aux$Method, p.adjust.method = padj)$p.value))
     temp$value
   }
@@ -156,15 +157,16 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
 
 #' This function makes the mean of your replicates for each methods
 #'
-#' @param long_df Melted data.frame with replicates_factor()
+#' @param df with protein abundances
 #'
 #' @return A data.frame of the mean of each method
 #' @export
 #'
 #' @examples data("log2")
-#' mean_function(replicates_factor(log2))
-mean_function <- function(long_df) {
-  meanagg <- aggregate(value ~ name + Method, data = long_df, FUN = mean)
+#' mean_function(log2)
+mean_function <- function(df) {
+  df <- replicates_factor(df)
+  meanagg <- aggregate(value ~ name + Method, data = df, FUN = mean)
   meandf <- reshape(meanagg, idvar="name", timevar= "Method", direction="wide")
   names(meandf) <- gsub("value\\.", "", names(meandf))
   rownames(meandf) <- meandf$name
@@ -174,14 +176,15 @@ mean_function <- function(long_df) {
 
 #' Makes foldchange around your methods
 #'
-#' @param long_df Melted data.frame with replicates_factor()
+#' @param df with protein abundances in mean. removing replicates can be done with mean_function()
 #'
 #' @return A data.frame of the different fold.change values.
 #' @export
 #'
 #' @examples data("log2")
-#' myfoldchange(mean_function(replicates_factor(log2)))
+#' myfoldchange(mean_function(log2))
 myfoldchange <- function(df) {
+  df <- replicates_factor(df)
   log2fc <- function(x,y) {
     log2(x/y)
   }

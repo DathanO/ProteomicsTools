@@ -1,10 +1,10 @@
 Package: ProteomicsTools
 Type: Package
 Title: Analysis Tools for Proteomics Experiments
-Version: 0.6.7
+Version: 0.6.8
 Author: David Nathan Ohayon
 Maintainer: The package maintainer <david.ohayon@etu.unige.ch>
-Description: Functions to analyze Log2 Portein Abundances
+Description: Functions to analyze Log2 Protein Abundances
     MDS Plot
     Pairwise t-test
     Venn Diagrams

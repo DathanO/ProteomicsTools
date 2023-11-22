@@ -159,7 +159,7 @@ datatable(col_sorted(ttest), options = list(scrollX = TRUE, scrollY = "350px"))
 - Internal Function: Computes mean of the replicates 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-datatable(mean_function(replicates_factor(log2)), options = list(scrollX = TRUE, scrollY = "350px"))
+datatable(mean_function(log2), options = list(scrollX = TRUE, scrollY = "350px"))
 ```
 
 
