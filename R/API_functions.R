@@ -135,9 +135,9 @@ table_maker_from_strings <- function(df, colnamestring) {
   row_names <- df$Gene
   table <- data.frame(matrix(ncol = 0, nrow = length(row_names)))
   rownames(table) <- row_names
-  SubCellLoc <- unique(unlist(df[[colnamestring]]))
-  for (locations in SubCellLoc) {
-    table[[locations]] <- sapply(df[[colnamestring]], function(x) locations %in% x)
+  MinedStrings <- unique(unlist(df[[colnamestring]]))
+  for (string in MinedStrings) {
+    table[[string]] <- sapply(df[[colnamestring]], function(x) string %in% x)
   }
   table <- subset(table, select = -which(names(table) %in% c("Error: 400", "Error: 404")))
   return(table)

@@ -30,7 +30,7 @@ myMDSplot <- function(log2, rows = TRUE) {
 #'
 #' @examples data("log2")
 #' mypairwise_t(log2)
-mypairwise_t <- function(df, padj="none") {
+mypairwise_t <- function(df, padj="fdr") {
   df <- replicates_factor(df)
   method <- sort(unique(df$Method))
   methods <- expand.grid(method, method)
@@ -42,7 +42,7 @@ mypairwise_t <- function(df, padj="none") {
     temp <- na.omit(melt(stats::pairwise.t.test(aux$value, aux$Method, p.adjust.method = padj)$p.value))
     temp$value
   }
-  data <- Reduce(rbind, Map(ptt, vectorgene))
+  data <- data.frame(Reduce(rbind, Map(ptt, vectorgene)))
   rownames(data) <- vectorgene
   colnames(data) <- colnames
   data
