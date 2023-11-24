@@ -183,21 +183,21 @@ mean_function <- function(df) {
 #'
 #' @examples data("log2")
 #' myfoldchange(mean_function(log2))
-myfoldchange <- function(df) {
+myfoldchange <- function(meandflog2) {
   log2fc <- function(x,y) {
     log2(x/y)
   }
-  df <- melt(df)
-  method <- sort(unique(df$variable))
+  meandf <- reshape2::melt(meandflog2)
+  method <- sort(unique(meandf$variable))
   methods <- expand.grid(method, method)
   methods <- methods[as.character(methods$Var1) > as.character(methods$Var2),]
   colnames <- unlist(Map(paste, methods$Var1, methods$Var2, sep="_vs_"))
-  data <- Map(function(x,y) log2fc(df[df$variable == x, 'value'],
-                                   df[df$variable == y, 'value']),
+  data <- Map(function(x,y) log2fc(meandf[meandf$variable == x, 'value'],
+                                   meandf[meandf$variable == y, 'value']),
               methods$Var1, methods$Var2)
   names(data) <- colnames
   data <- as.data.frame(data)
-  rownames(data) <- unique(df$name)
+  rownames(data) <- rownames(meandflog2)
   data
 }
 

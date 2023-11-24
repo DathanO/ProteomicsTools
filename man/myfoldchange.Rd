@@ -4,10 +4,10 @@
 \alias{myfoldchange}
 \title{Makes foldchange around your methods}
 \usage{
-myfoldchange(df)
+myfoldchange(meandflog2)
 }
 \arguments{
-\item{df}{with protein abundances in mean. removing replicates can be done with mean_function()}
+\item{df}{with protein abundances in mean. removing replicates can be done with mean_function(). gene name should be named "name" if you want to keep it as rowname.}
 }
 \value{
 A data.frame of the different fold.change values.
