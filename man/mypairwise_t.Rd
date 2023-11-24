@@ -4,7 +4,7 @@
 \alias{mypairwise_t}
 \title{Automatize pairwise t.test of your data.}
 \usage{
-mypairwise_t(df, padj = "none")
+mypairwise_t(df, padj = "fdr")
 }
 \arguments{
 \item{df}{A data.frame with protein abundances}
