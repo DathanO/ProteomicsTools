@@ -176,7 +176,7 @@ mean_function <- function(df) {
 
 #' Makes foldchange around your methods
 #'
-#' @param df with protein abundances in mean. removing replicates can be done with mean_function()
+#' @param df with protein abundances in mean. removing replicates can be done with mean_function(). gene name should be named "name" if you want to keep it as rowname.
 #'
 #' @return A data.frame of the different fold.change values.
 #' @export
@@ -197,7 +197,7 @@ myfoldchange <- function(df) {
               methods$Var1, methods$Var2)
   names(data) <- colnames
   data <- as.data.frame(data)
-  rownames(data) <- unique(df$gene)
+  rownames(data) <- unique(df$name)
   data
 }
 
