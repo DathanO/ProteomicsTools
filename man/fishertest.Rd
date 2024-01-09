@@ -23,6 +23,6 @@ Makes a Fisher Exact Test to get enrichment of your logical columns
 data("ttest")
 # taille du points: nombre de gene T_T
 # couleur du point: p.value
-data("big")
-fishertest(reformat_table(big), reformat_table(ttest), "fdr")
+data("datamined")
+fishertest(reformat_table(datamined), reformat_table(ttest), "fdr")
 }

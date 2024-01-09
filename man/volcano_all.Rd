@@ -4,14 +4,25 @@
 \alias{volcano_all}
 \title{Compare your volcano plots together}
 \usage{
-volcano_all(ttest, foldc, big, binarycol, threshold = 5, path = "examples/")
+volcano_all(
+  ttest,
+  foldc,
+  datamined,
+  binarycol,
+  threshold = 5,
+  namefile = "Volcano_",
+  path = "examples/",
+  width = 40,
+  height = 6,
+  saveplot = FALSE
+)
 }
 \arguments{
 \item{ttest}{output of mypairwise_t}
 
 \item{foldc}{output of myfoldchange}
 
-\item{big}{dataframe with a logical variable to highlight}
+\item{datamined}{dataframe with a logical variable to highlight}
 
 \item{binarycol}{the variable to highlight}
 
@@ -28,7 +39,5 @@ Compare your volcano plots together
 \examples{
 data("ttest")
 data("foldc")
-volcano_all(ttest, foldc, big, "Groups.of.TM")
-# to visualize each variable in a for loop, you can use colnames():
-# for (colname in colnames(big)[-1]) {volcano_all(ttest, foldc, big, colname)}
+volcano_all(ttest, foldc, datamined, "Groups.of.TM")
 }

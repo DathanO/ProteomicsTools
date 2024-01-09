@@ -4,10 +4,12 @@
 \alias{table_maker_from_strings}
 \title{Transform list of subcell locations into a wide logistic table.}
 \usage{
-table_maker_from_strings(df, colnamestring)
+table_maker_from_strings(csv_column, df = NULL)
 }
 \arguments{
-\item{df}{containing subcell strings after get_nextprot_subcell() with colname "SubcellStrings"}
+\item{csv_column}{the specific column with the comma separated string}
+
+\item{df}{facultative data.frame to retrieve rownames if needed}
 }
 \value{
 logistic table of the mined strings
@@ -16,5 +18,5 @@ logistic table of the mined strings
 Transform list of subcell locations into a wide logistic table.
 }
 \examples{
-table_maker_from_strings(datamined, "SubcellStrings")
+table_maker_from_strings(newdata$Subcell, newdata)
 }

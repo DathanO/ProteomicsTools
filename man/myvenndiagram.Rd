@@ -4,7 +4,7 @@
 \alias{myvenndiagram}
 \title{Automatize and Save VennDigram of the result of the mypairwise_t() above}
 \usage{
-myvenndiagram(output_ttest, path = "examples/")
+myvenndiagram(output_ttest, path = "examples/", saveplot = FALSE)
 }
 \arguments{
 \item{path}{will define directory to store output. by default, files are saved within wd}

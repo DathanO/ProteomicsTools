@@ -7,9 +7,9 @@
 datamining_assembling(df, colname, fun)
 }
 \arguments{
-\item{df}{containing UniProtID}
+\item{df}{containing "UniProtID" as colname}
 
-\item{colname}{in strings of the new column}
+\item{colname}{in strings of the datamined column}
 
 \item{fun}{name of the function to use}
 }

@@ -5,26 +5,32 @@
 \title{Automatize VolcanoPlots of your dataset}
 \usage{
 volcano_maker(
-  dfpval,
-  dffoldchange,
-  binarydf,
+  ttest,
+  foldc,
+  datamined,
   binarycol,
   threshold = 5,
-  path = "examples/"
+  namefile = "Volcano",
+  path = "examples/",
+  width = 10,
+  height = 10,
+  saveplot = FALSE
 )
 }
 \arguments{
-\item{dfpval}{A data.frame of p.values (Output of mypairwise_t())}
+\item{ttest}{A data.frame of p.values (Output of mypairwise_t())}
 
-\item{dffoldchange}{A data.frame of fold changes (Output of myfoldchange())}
+\item{foldc}{A data.frame of fold changes (Output of myfoldchange())}
 
-\item{binarydf}{A reformated data.frame of mined data (reformat_table(big))}
+\item{datamined}{A reformated data.frame of mined data (reformat_table(datamined))}
 
 \item{binarycol}{A String parameter of the column you wish to highlight}
 
 \item{threshold}{should depend on the p.value adjustment, you can adapt it to your data}
 
 \item{path}{will define directory to store output. by default, files are saved within working directory}
+
+\item{saveplot}{boolean parameter to whether save or not the plot}
 }
 \value{
 Saves X plots of your pairs of methods, X being 2 times the amount of methods
@@ -35,6 +41,6 @@ Automatize VolcanoPlots of your dataset
 \examples{
 data("ttest")
 data("foldc")
-data("big")
-volcano_maker(ttest, foldc, reformat_table(big), "Groups.of.TM")
+data("datamined")
+volcano_maker(ttest, foldc, reformat_table(datamined), "Groups.of.TM")
 }
