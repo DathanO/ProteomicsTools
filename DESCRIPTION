@@ -1,7 +1,7 @@
 Package: ProteomicsTools
 Type: Package
 Title: Analysis Tools for Proteomics Experiments
-Version: 0.7.0
+Version: 0.8.1
 Author: David Nathan Ohayon
 Maintainer: The package maintainer <david.ohayon@etu.unige.ch>
 Description: Functions to analyze Log2 Protein Abundances
@@ -15,6 +15,7 @@ Description: Functions to analyze Log2 Protein Abundances
     Table Formatting to transform numeric p-values into logical (T/F)
     HeatMaps
     Datamining via NeXtProt's API
+    Data Processing
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
@@ -30,6 +31,7 @@ Depends:
   ComplexHeatmap (>= 2.16.0),
   limma (>= 3.56.1),
   edgeR (>= 3.42.2),
+  GGally,
   pbapply,
   httr,
   jsonlite
