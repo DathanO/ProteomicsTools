@@ -60,7 +60,7 @@ mypairwise_t <- function(df, padj="fdr") {
 #'
 #' @examples data("ttest")
 #' myvenndiagram(ttest)
-myvenndiagram <- function(output_ttest, path="examples/") {
+myvenndiagram <- function(output_ttest, path="examples/", saveplot=FALSE) {
   methods <- unique(unlist(strsplit(colnames(output_ttest), "_vs_")))
   pairs <- colnames(output_ttest)
   for (method in methods) {
@@ -72,9 +72,11 @@ myvenndiagram <- function(output_ttest, path="examples/") {
     }
     plot <- ggvenn::ggvenn(listmethod, set_name_size = 2)
     plot
-    filename <- paste("VennDiagram", method, sep="_")
-    filename <- paste(path, filename, ".png", sep="")
-    ggplot2::ggsave(filename, bg="white", limitsize = FALSE)
+    if (saveplot) {
+      filename <- paste("VennDiagram", method, sep="_")
+      filename <- paste(path, filename, ".png", sep="")
+      ggplot2::ggsave(filename, bg="white", limitsize = FALSE)
+    }
   }
   return(plot)
 }
@@ -130,8 +132,8 @@ reformat_table <- function(df, padj="fdr", treshold=0.05) {
 #' @examples data("ttest")
 #' # taille du points: nombre de gene T_T
 #' # couleur du point: p.value
-#' data("big")
-#' fishertest(reformat_table(big), reformat_table(ttest), "fdr")
+#' data("datamined")
+#' fishertest(reformat_table(datamined), reformat_table(ttest), "fdr")
 fishertest <- function(df_mined, ttest_logical, padj = "none") {
   results <- data.frame(Table = character(), False_False = integer(), False_True = integer(), True_False = integer(), True_True = integer(), p_val_fisher = numeric(), p_adj = numeric(), stringsAsFactors = FALSE)
   for (ncol in (1:length(df_mined))) {
@@ -165,12 +167,16 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
 #' @examples data("log2")
 #' mean_function(log2)
 mean_function <- function(df) {
-  df <- replicates_factor(df)
-  meanagg <- aggregate(value ~ name + Method, data = df, FUN = mean)
+  dfrep <- replicates_factor(df)
+  df$order <- seq_len(nrow(df))
+  meanagg <- aggregate(value ~ name + Method, data = dfrep, FUN = mean)
   meandf <- reshape(meanagg, idvar="name", timevar= "Method", direction="wide")
   names(meandf) <- gsub("value\\.", "", names(meandf))
+  columns <- subset(df, select=c("name", "order"))
+  meandf <- merge(meandf, columns, by="name")
+  meandf <- meandf[order(meandf$order),]
   rownames(meandf) <- meandf$name
-  meandf <- meandf[,-1]
+  meandf <- subset(meandf, select=-(order))
   meandf
 }
 
@@ -203,12 +209,13 @@ myfoldchange <- function(meandflog2) {
 
 #' Automatize VolcanoPlots of your dataset
 #'
-#' @param dfpval A data.frame of p.values (Output of mypairwise_t())
-#' @param dffoldchange A data.frame of fold changes (Output of myfoldchange())
-#' @param binarydf A reformated data.frame of mined data (reformat_table(big))
+#' @param ttest A data.frame of p.values (Output of mypairwise_t())
+#' @param foldc A data.frame of fold changes (Output of myfoldchange())
+#' @param datamined A reformated data.frame of mined data (reformat_table(datamined))
 #' @param binarycol A String parameter of the column you wish to highlight
 #' @param path will define directory to store output. by default, files are saved within working directory
 #' @param threshold should depend on the p.value adjustment, you can adapt it to your data
+#' @param saveplot boolean parameter to whether save or not the plot
 #' @export
 #' @return Saves X plots of your pairs of methods, X being 2 times the amount of methods
 #' @import ggplot2
@@ -216,20 +223,19 @@ myfoldchange <- function(meandflog2) {
 #'
 #' @examples data("ttest")
 #' data("foldc")
-#' data("big")
-#' volcano_maker(ttest, foldc, reformat_table(big), "Groups.of.TM")
-volcano_maker <- function(dfpval, dffoldchange, binarydf, binarycol, threshold=5, path="examples/") {
-  for (i in colnames(dfpval)) {
+#' data("datamined")
+#' volcano_maker(ttest, foldc, reformat_table(datamined), "Groups.of.TM")
+volcano_maker <- function(ttest, foldc, datamined, binarycol, threshold=5, namefile="Volcano", path="examples/", width=10, height=10, saveplot=FALSE) {
+  for (i in colnames(ttest)) {
     new <- as.list(sort(unlist(strsplit(i, "_vs_"))))
-    for (l in colnames(dffoldchange)) {
+    for (l in colnames(foldc)) {
       cut <- as.list(sort(unlist(strsplit(l, "_vs_"))))
       if (setequal(new, cut)) {
         name <- paste(new, collapse="_vs_")
-        table2plot <- cbind(dfpval[,i], dffoldchange[,l], binarydf[,binarycol])
+        table2plot <- cbind(ttest[,i], foldc[,l], datamined[,binarycol])
         table2plot <- data.frame(table2plot)
-        rownames(table2plot) <- rownames(dfpval)
+        rownames(table2plot) <- rownames(ttest)
         colnames(table2plot) <- c("log10pval", "log2foldchange", binarycol)
-        table2plot[,binarycol] <- as.logical(table2plot[,binarycol])
         plot <- ggplot2::ggplot(data=table2plot, ggplot2::aes(x=log2foldchange, y=-log10(log10pval), color=!!rlang::sym(binarycol))) +
           ggplot2::geom_point() + ggplot2::ylab("-log10pval") +
           ggplot2::geom_vline(xintercept=c(-0.1, 0.1), col="black") +
@@ -238,10 +244,12 @@ volcano_maker <- function(dfpval, dffoldchange, binarydf, binarycol, threshold=5
           ggplot2::xlim(c(-0.6, 0.6)) +
           ggplot2::ggtitle(rlang::sym(l)) +
           ggplot2::theme_classic()
-        filename <- paste("Volcano", binarycol, l, sep="_")
-        filename <- paste(path, filename, ".png", sep="")
         plot
-        ggplot2::ggsave(filename)
+        if (saveplot) {
+          filename <- paste(namefile, binarycol, l, sep="_")
+          filename <- paste(path, filename, ".png", sep="")
+          ggplot2::ggsave(filename, width = width, height = height)
+        }
       }
     }
   }
@@ -277,10 +285,9 @@ heatmap_maker <- function(num_df, scale_data=TRUE) {
 #' @return A plot of the fisher test enrichment
 #' @import ggplot2
 #' @import tidyr
-#'
 #' @examples data("ftest")
-#' fisher_dotplot(ftest)
-fisher_dotplot <- function(ftest, path="examples/") {
+#' dotplot_maker(fisher_subcell, width=25, height=10)
+dotplot_maker <- function(ftest, namefile="FisherDotPlot_Enrichment.png", path="examples/", width = 25, height = 6, saveplot=FALSE) {
   results <- ftest[ftest$padj<0.05,]
   result <- magrittr::"%>%"(results, tidyr::separate(., Table, c("Mined", "Pair"), sep = "_X_"))
   plot <- ggplot2::ggplot(result, ggplot2::aes(x=Pair, y=Mined, color=padj, size=gene.ratio)) +
@@ -290,10 +297,14 @@ fisher_dotplot <- function(ftest, path="examples/") {
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
     ggplot2::xlab("Pairs of Methods") +
     ggplot2::ylab("Mined Properties") +
-    ggplot2::ggtitle("DotPlot [Enrichment Results]")
+    ggplot2::ggtitle("DotPlot [Enrichment Results]") +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
+                   panel.grid.major = ggplot2::element_line(size = 0.15, linetype = 'solid', colour = 'white'))
   plot
-  filename <- paste(path, "FisherDotPlot_Enrichment.png", sep="")
-  ggplot2::ggsave(filename, width = 25, height = 6)
+  if (saveplot) {
+    filename <- paste(path, namefile, sep="")
+    ggplot2::ggsave(filename, width = width, height = height)
+  }
   return(plot)
 }
 
@@ -320,7 +331,7 @@ col_sorted <- function(data) {
 #'
 #' @param ttest output of mypairwise_t
 #' @param foldc output of myfoldchange
-#' @param big dataframe with a logical variable to highlight
+#' @param datamined dataframe with a logical variable to highlight
 #' @param binarycol the variable to highlight
 #' @param path will define directory to store output. by default, files are saved within wd
 #' @param threshold should depend on the p.value adjustment, you can adapt it to your data
@@ -331,16 +342,13 @@ col_sorted <- function(data) {
 #'
 #' @examples data("ttest")
 #' data("foldc")
-#' volcano_all(ttest, foldc, big, "Groups.of.TM")
-#' # to visualize each variable in a for loop, you can use colnames():
-#' # for (colname in colnames(big)[-1]) {volcano_all(ttest, foldc, big, colname)}
-volcano_all <- function(ttest, foldc, big, binarycol, threshold=5, path="examples/") {
+#' volcano_all(ttest, foldc, datamined, "Groups.of.TM")
+volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefile="Volcano_", path="examples/", width=40, height=6, saveplot=FALSE) {
   ttestL <- col_sorted(ttest)
   foldcL <- col_sorted(foldc)
   table <- merge(ttestL, foldcL, by=c("name", "variable"))
-  table2highlight <- subset(big, select=c("name", binarycol))
+  table2highlight <- subset(datamined, select=c("name", binarycol))
   table2plot <- merge(table, table2highlight, by="name")
-  table2plot[,binarycol] <- as.logical(table2plot[,binarycol])
   plot <- ggplot2::ggplot(data=table2plot, ggplot2::aes(x=value.y, y=-log10(value.x), color=!!rlang::sym(binarycol))) +
     ggplot2::geom_point() + ggplot2::facet_grid(~variable) +
     ggplot2::ylab("-log10pval") +
@@ -349,8 +357,30 @@ volcano_all <- function(ttest, foldc, big, binarycol, threshold=5, path="example
     ggplot2::geom_hline(yintercept=threshold, col="black") +
     ggplot2::theme_classic()
   plot
-  filename <- paste(path, "Volcano_", binarycol, ".png", sep="")
-  ggplot2::ggsave(filename, width = 40, height = 6)
+  if (saveplot) {
+    filename <- paste(path, namefile, binarycol, ".png", sep="")
+    ggplot2::ggsave(filename, width = width, height = height)
+  }
   return(plot)
+}
+
+#' Title
+#'
+#' @param log2 log2 protein abundances table
+#' @param datamined datamined table
+#' @param column2highlight factor or logistic column to highlight plots
+#'
+#' @return exploratory plots from ggpairs
+#' @export
+#'
+#' @examples ggpairs_proteomics(log2, datamined, "Groups.of.TM")
+ggpairs_proteomics <- function(log2, datamined, column2highlight) {
+  meanmethods <- mean_function(log2)
+  data2highlight <- subset(datamined, select=c("name", column2highlight))
+  data2plot <- merge(meanmethods, data2highlight, by="name")
+  data2plot$name <- NULL
+  plottitle <- paste0("Exploratory graphs of the data, colored by: ", column2highlight)
+  GGally::ggpairs(data2plot, ggplot2::aes(color=!!rlang::sym(column2highlight), alpha = 0.5), upper = list(continuous = GGally::wrap("cor", size = 2)),
+                  title=plottitle) + ggplot2::theme(axis.text = element_text(size = 8))
 }
 
