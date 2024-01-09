@@ -1,0 +1,289 @@
+---
+title: "ProteomicsTools"
+author: "David Nathan Ohayon"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{ProteomicsTools}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r, include=FALSE}
+library(ProteomicsTools)
+library(DT)
+```
+
+# Introduction
+![Logo](../data/UNIGE.png){width=200px height=100px style="position: absolute; top: 20px; left: 900px;"}
+Welcome to the **ProteomicsTools** vignette! This vignette provides an introduction to the installation, functionality and usage of the package.
+
+
+## Package Overview
+
+**ProteomicsTools** is designed to help Proteomics researches, especially to compare methods of protein extraction. Various analytics and visualization tools are provided in order to compare 5 methods of extraction. 
+
+## Installation 
+
+To install this package, you must first install various packages, including packages from Bioconductor. The first step is to install BiocManager with:
+
+```{r}
+# installation of BiocManager in order to install Bioconductor packages:
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+```
+
+### Installation of Bioconductor packages:
+```{r, eval=FALSE}
+BiocManager::install("ComplexHeatmap")
+BiocManager::install("limma")
+BiocManager::install("edgeR")
+```
+
+### Installation of CRAN packages:
+```{r, eval=FALSE}
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("ggvenn")
+install.packages("reshape2")
+install.packages("rlang")
+install.packages("tidyr")
+install.packages("stats")
+```
+
+### Installation of the package.tar.gz
+```{r, eval=FALSE}
+install.packages("~/path/ProteomicsTools_version.tar.gz", repos = NULL, type = "source")
+```
+
+## Presentation of the package {.flexbox .vcenter}
+
+- Goals of the package:
+  - Analyze proteomic data (log2 protein abundances)
+  - Compare methods of extraction
+  - Visualization tools
+
+- Package build around MaxQuant analyze and in order to compare 5 methods of extraction:
+  - RIPA
+  - NucleoSpin
+  - Tris.HCl
+  - Triton.X100
+  - Urea
+  
+### Protein Abundances Table
+
+To use the package, your table must be in a certain format (MaxQuant): 
+
+- Gene names (or other ID) must be in the first column
+- Column names must be the method of extraction. 
+- The separation between the method and the replicates should be an underscore. 
+- Values should be Log2 of the Protein abundance
+- Log2 tables should be filtered to get only an identifier and the protein abundance:
+
+```{r, echo=TRUE, eval=FALSE, cache=TRUE}
+# example table
+datatable(log2[,-1], options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+---
+
+### You can use mined data, and use the package to mine data:
+
+```{r, echo=TRUE, eval=FALSE}
+datatable(tail(datamined), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+### Internal functions
+
+
+- Internal Function to create the replicate variable
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(replicates_factor(log2), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+---
+
+- Internal Function: change numeric p-value into logical significance
+
+```{r, cache=TRUE}
+datatable(reformat_table(ttest), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+---
+
+- Internal Function to sort pairs of methods
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(col_sorted(ttest), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+---
+
+- Internal Function: Computes mean of the replicates 
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(mean_function(log2)[,-1], options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+
+
+
+---
+
+## Analyzation tools
+
+- mypairwise_t() will compute pairwise t-test for each pairs of methods.
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(mypairwise_t(log2), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+---
+
+
+- myfoldchange() will compute pairwise foldchange for each pairs of methods
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(myfoldchange(log2), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+
+---
+
+- fishertest() will compute enrichment analysis for each pairs of methods with one of your mined data
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE}
+datatable(fishertest(subcell, reformat_table(ttest)), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+
+---
+
+## Visualization tools
+
+- MultiDimensional Scaling Plot
+
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=12, fig.height=5, dpi=72, cache=TRUE}
+myMDSplot(log2)
+```
+
+---
+
+-Heatmap of the log2 data
+<div style="height: 470px; overflow: scroll;">
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=13, fig.height=400, dpi=72, cache=TRUE}
+heatmap_maker(log2[,-1])
+```
+</div>
+
+
+- myvenndiagram() will compute volcano venn diagram of your data
+
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=5, cache=TRUE}
+myvenndiagram(ttest)
+```
+
+---
+
+- volcano_all() will compute volcano plots for your data
+
+<div style="height: 470px; overflow: scroll;">
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=40, fig.height=5, dpi=72, cache=TRUE}
+volcano_all(ttest, foldc, datamined, "Groups.of.TM")
+```
+</div>
+
+---
+
+- Isolate volcano plot
+
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=8, cache=TRUE}
+volcano_maker(ttest, foldc, datamined, "TMregions")
+```
+
+---
+
+- This enrichment can be seen with dotplot_maker()
+
+<div style="height: 470px; overflow: scroll;">
+```{r, echo = TRUE, highlight=FALSE, fig.width=20, fig.height=6, cache=TRUE}
+dotplot_maker(fisher_subcell)
+```
+</div>
+
+---
+
+## Datamining tools
+
+The datamining tools are using NeXtProt's API to manage enrichment analysis. To this end, UniProt ID is needed to run the analysis. 
+Since MaxQuant are giving UniProt ID, we can directly use them to get some of the protein's properties. However, with the complexity of those studies, it is usual to find a few proteins within the same row, which means that the identified peptides are shared between proteins. In that case, you should use proteinid_parser() to get only one protein per row, to send to NeXtProt.
+You have the choice to use either all the identified proteins, either only the first one, which is usually the canonical of the implied gene:
+
+```{r, cache=TRUE}
+datatable(proteinid_parser(log2raw, "Majority.protein.IDs"), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+You can also ask swissprot for the canonical ProteinID for a given gene. Since MaxQuant usually gives gene name, it can be useful to use that tool. Be careful though, gene names has to be the exact gene names as it appears on UniProt, otherwise you'll get NA values.
+
+```{r, cache=TRUE}
+get_swissprot_id("A2M", organism = 9606, reviewed="true")
+```
+
+
+You can also combine this function with another to use pbl package to apply to your column:
+
+```{r, cache=TRUE}
+uniprot_assembling(head(log2))
+```
+
+You can ask NeXtProt to mine IP, Mass, TMregions, glycosylation site, and subcellular location of the protein of interest.
+
+```{r, cache=TRUE}
+get_nextprot_PI("P01023")
+get_nextprot_mass("P01023")
+get_nextprot_transmembrane("P01023")
+get_nextprot_glycosite("P01023")
+get_nextprot_subcell("P01023")
+```
+
+You can also use another function in combination to apply to your column, which works for all above functions:
+
+```{r, cache=TRUE}
+datamining_assembling(head(subset(datamined, select = c(1:2))), "Subcell", get_nextprot_subcell)
+```
+
+
+As you can see, if you mine subcellular location and glycosylation site you will get strings columns. You can use the function below to transform this column into a new table:
+
+```{r, cache=TRUE}
+datatable(table_maker_from_strings(datamined$Subcell, df = datamined), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+On the other hand, some columns will be number and won't be easy to be analyzed, you can use this function below:
+
+```{r, cache=TRUE}
+datatable(column_maker(subset(datamined, select=c(name, UniProtID, Mass)), "Mass", "BinaryMass"), options = list(scrollX = TRUE, scrollY = "400px"))
+
+
+
+```
+
+```{r, cache=TRUE}
+datatable(column_maker(subset(datamined, select=c(name, UniProtID, IP)), "IP", "IPbinary"), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+
+```{r, cache=TRUE}
+datatable(column_maker(subset(datamined, select=c(name, UniProtID, TMregions)), "TMregions", "TMregionsGroups"), options = list(scrollX = TRUE, scrollY = "400px"))
+```
+

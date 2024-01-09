@@ -19,7 +19,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message=FALSE}
 library(ProteomicsTools)
 ```
 
@@ -40,7 +40,6 @@ library(ProteomicsTools)
     - Analyze proteomic data
     - Compare methods of extraction
     - Visualization tools
- 
 
 --- 
 
@@ -56,10 +55,10 @@ datatable(log2[,-1], options = list(scrollX = TRUE, scrollY = "350px"))
 
 ### Mined Data from NeXtProt
 
-```{r}
+```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=12, fig.height=5, dpi=72}
 library(DT)
-rownames(big) <- big[,1]
-datatable(big[,-1], options = list(scrollX = TRUE, scrollY = "350px"))
+rownames(datamined) <- datamined[,1]
+datatable(datamined[,-1], options = list(scrollX = TRUE, scrollY = "350px"))
 ```
 
 ---
@@ -126,7 +125,7 @@ datatable(ftest, options = list(scrollX = TRUE, scrollY = "350px"))
 ### Internal Function: Computes mean of the replicates 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-datatable(mean_function(replicates_factor(log2)), options = list(scrollX = TRUE, scrollY = "350px"))
+datatable(mean_function(log2), options = list(scrollX = TRUE, scrollY = "350px"))
 ```
 
 ---
@@ -142,7 +141,7 @@ datatable(foldc, options = list(scrollX = TRUE, scrollY = "350px"))
 ### VolcanoPlots for each method, with extra highlight 
 <div style="height: 470px; overflow: scroll;">
 ```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=40, fig.height=5, dpi=72}
-volcano_all(ttest, foldc, big, "TMregions", path = "../examples/")
+volcano_all(ttest, foldc, datamined, "TMregions", path = "../examples/")
 
 ```
 </div>
@@ -157,18 +156,10 @@ volcano_maker(ttest, foldc, big, "TMregions", path = "../examples/")
 
 ---
 
-### Venn Diagram for each method
-
-```{r, echo = TRUE, highlight=FALSE, warning=FALSE, message=FALSE, fig.width=13.5, fig.height=5.5, dpi=72}
-myvenndiagram(ttest, path = "../examples/")
-```
-
----
-
 ### DotPlot to visualize enrichment analysis
 
 ```{r, echo = TRUE, highlight=FALSE, fig.width=10, fig.height=5.2}
-fisher_dotplot(ftest, path = "../examples/")
+fisher_dotplot(fisher_subcell, path = "../examples/")
 ```
 
 
