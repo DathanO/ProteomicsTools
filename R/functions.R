@@ -81,7 +81,7 @@ myvenndiagram <- function(output_ttest, path="examples/", saveplot=FALSE) {
   return(plot)
 }
 
-#' Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable.
+#' Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable. Default separator is "_".
 #'
 #' @param df Unmelted df (log2)
 #' @export
@@ -89,9 +89,9 @@ myvenndiagram <- function(output_ttest, path="examples/", saveplot=FALSE) {
 #'
 #' @examples data("log2")
 #' replicates_factor(log2)
-replicates_factor <- function(df) {
+replicates_factor <- function(df, sep="_") {
   longdf <- reshape2::melt(df)
-  final <- magrittr::"%>%"(longdf, tidyr::separate(., variable, c("Method", "Replicates"), sep = "_"))
+  final <- magrittr::"%>%"(longdf, tidyr::separate(., variable, c("Method", "Replicates"), sep = sep))
   return(final)
 }
 

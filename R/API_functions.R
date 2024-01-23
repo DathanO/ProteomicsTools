@@ -223,7 +223,7 @@ proteinid_parser <- function(df, colname, sep=";", KeepAllProteins=FALSE) {
     return(as.data.frame(newdata))
   } else {
     df[[colname]] <- sub(";.*", "", df[[colname]])
-    return(df)
+    return(as.data.frame(df))
   }
 }
 
