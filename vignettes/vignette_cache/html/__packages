@@ -1,0 +1,16 @@
+BiocManager
+ggplot2
+dplyr
+ggvenn
+reshape2
+rlang
+tidyr
+ComplexHeatmap
+limma
+edgeR
+GGally
+pbapply
+httr
+jsonlite
+ProteomicsTools
+DT

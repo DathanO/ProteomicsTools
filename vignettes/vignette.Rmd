@@ -230,7 +230,7 @@ The datamining tools are using NeXtProt's API to manage enrichment analysis. To 
 Since MaxQuant are giving UniProt ID, we can directly use them to get some of the protein's properties. However, with the complexity of those studies, it is usual to find a few proteins within the same row, which means that the identified peptides are shared between proteins. In that case, you should use proteinid_parser() to get only one protein per row, to send to NeXtProt.
 You have the choice to use either all the identified proteins, either only the first one, which is usually the canonical of the implied gene:
 
-```{r, cache=TRUE}
+```{r, cache=TRUE, warning=FALSE, message=FALSE}
 datatable(proteinid_parser(log2raw, "Majority.protein.IDs"), options = list(scrollX = TRUE, scrollY = "400px"))
 ```
 
@@ -247,7 +247,7 @@ You can also combine this function with another to use pbl package to apply to y
 uniprot_assembling(head(log2))
 ```
 
-You can ask NeXtProt to mine IP, Mass, TMregions, glycosylation site, and subcellular location of the protein of interest.
+You can use the package in order to mine IP, Mass, TMregions, glycosylation site, and subcellular location of the protein of interest from NeXtProt.
 
 ```{r, cache=TRUE}
 get_nextprot_PI("P01023")
@@ -274,8 +274,6 @@ On the other hand, some columns will be number and won't be easy to be analyzed,
 
 ```{r, cache=TRUE}
 datatable(column_maker(subset(datamined, select=c(name, UniProtID, Mass)), "Mass", "BinaryMass"), options = list(scrollX = TRUE, scrollY = "400px"))
-
-
 
 ```
 
