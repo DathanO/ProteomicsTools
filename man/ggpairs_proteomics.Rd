@@ -2,14 +2,14 @@
 % Please edit documentation in R/functions.R
 \name{ggpairs_proteomics}
 \alias{ggpairs_proteomics}
-\title{Title}
+\title{ggpairs plot with extra highlight on a specific column}
 \usage{
 ggpairs_proteomics(log2, datamined, column2highlight)
 }
 \arguments{
-\item{log2}{log2 protein abundances table}
+\item{log2}{log2 protein abundances table; with "name" column which is the protein/gene identifier}
 
-\item{datamined}{datamined table}
+\item{datamined}{datamined table, with the exact same column "name"}
 
 \item{column2highlight}{factor or logistic column to highlight plots}
 }
@@ -17,7 +17,7 @@ ggpairs_proteomics(log2, datamined, column2highlight)
 exploratory plots from ggpairs
 }
 \description{
-Title
+ggpairs plot with extra highlight on a specific column
 }
 \examples{
 ggpairs_proteomics(log2, datamined, "Groups.of.TM")

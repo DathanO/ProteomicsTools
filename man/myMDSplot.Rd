@@ -7,7 +7,7 @@
 myMDSplot(log2, rows = TRUE)
 }
 \arguments{
-\item{log2}{your first table with log2 normalized data of protein abundances}
+\item{log2}{your first table with log2 normalized data of protein abundances, with a "name" column of your identifiers}
 
 \item{rows}{If True, rownames will take the first column and delete it from the data frame}
 }

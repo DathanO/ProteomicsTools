@@ -2,12 +2,12 @@
 % Please edit documentation in R/functions.R
 \name{dotplot_maker}
 \alias{dotplot_maker}
-\title{Title}
+\title{Enrichment plot of your data}
 \usage{
 dotplot_maker(
   ftest,
   namefile = "FisherDotPlot_Enrichment.png",
-  path = "examples/",
+  path = "",
   width = 25,
   height = 6,
   saveplot = FALSE
@@ -22,7 +22,7 @@ dotplot_maker(
 A plot of the fisher test enrichment
 }
 \description{
-Title
+Enrichment plot of your data
 }
 \examples{
 data("ftest")

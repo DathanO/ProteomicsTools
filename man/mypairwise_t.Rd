@@ -7,7 +7,7 @@
 mypairwise_t(df, padj = "fdr")
 }
 \arguments{
-\item{df}{A data.frame with protein abundances}
+\item{df}{A data.frame with protein abundances, with a "name" column of your identifiers}
 
 \item{padj}{A string parameter defining the correction methods. See ?p.adjust}
 }

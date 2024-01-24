@@ -2,9 +2,9 @@
 % Please edit documentation in R/functions.R
 \name{replicates_factor}
 \alias{replicates_factor}
-\title{Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable.}
+\title{Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable. Default separator is "_".}
 \usage{
-replicates_factor(df)
+replicates_factor(df, sep = "_")
 }
 \arguments{
 \item{df}{Unmelted df (log2)}
@@ -13,7 +13,7 @@ replicates_factor(df)
 A long and reformated data.frame
 }
 \description{
-Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable.
+Used melt() and separate() to reformat your table into a long one, which will seperate your replicates as a new variable. Default separator is "_".
 }
 \examples{
 data("log2")

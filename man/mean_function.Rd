@@ -7,7 +7,7 @@
 mean_function(df)
 }
 \arguments{
-\item{df}{with protein abundances}
+\item{df}{with protein abundances, with a "name" column of your identifiers}
 }
 \value{
 A data.frame of the mean of each method

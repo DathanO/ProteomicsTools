@@ -11,18 +11,18 @@ volcano_all(
   binarycol,
   threshold = 5,
   namefile = "Volcano_",
-  path = "examples/",
+  path = "",
   width = 40,
   height = 6,
   saveplot = FALSE
 )
 }
 \arguments{
-\item{ttest}{output of mypairwise_t}
+\item{ttest}{output of mypairwise_t, with a "name" column of your identifiers}
 
-\item{foldc}{output of myfoldchange}
+\item{foldc}{output of myfoldchange, with a "name" column of your identifiers}
 
-\item{datamined}{dataframe with a logical variable to highlight}
+\item{datamined}{dataframe with a logical variable to highlight, with a "name" column of your identifiers}
 
 \item{binarycol}{the variable to highlight}
 

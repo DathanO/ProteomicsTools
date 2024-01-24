@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{heatmap_maker}
 \alias{heatmap_maker}
-\title{Title}
+\title{Make Heatmap of your protein abundances table}
 \usage{
 heatmap_maker(num_df, scale_data = TRUE)
 }
@@ -15,7 +15,7 @@ heatmap_maker(num_df, scale_data = TRUE)
 Heatmap of your methods
 }
 \description{
-Title
+Make Heatmap of your protein abundances table
 }
 \examples{
 data("log2")
