@@ -246,11 +246,28 @@ column_maker <- function(df, colname2check, newcolname) {
       df[[newcolname]] <- as.logical(df[[colname2check]])
     } else {
       mean <- mean(df[[colname2check]])
-      print(mean)
       df[[newcolname]] <- ifelse(df[[colname2check]]>mean, "High", "Low")
       df[[newcolname]] <- as.factor(df[[newcolname]])
     }
-
   }
+  return(df)
+}
+
+#' create a new factor column based on the number of transmembrane domains.
+#'
+#' @param df with a column containing transmembrane domains
+#' @param colname string name of the new column created by the function
+#' @param newcolname string of the new colname
+#' @param treshold number of transmembrane to seperate. It will create 3 groups, 0, 1-treshold, and >treshold.
+#'
+#' @return a new dataframe with a new column
+#' @export
+#'
+#' @examples transmembrane_factor(datamined, "TMregions", "TMgroups")
+transmembrane_factor <- function(df, colname, newcolname, treshold = 3) {
+  middle <- paste0("1-", treshold)
+  high <- paste0(">", treshold)
+  df[[newcolname]] <- ifelse(datamined[[colname]] > 0, ifelse(datamined[[colname]] <= treshold, middle, high), "0")
+  df[[newcolname]] <- as.factor(df[[newcolname]])
   return(df)
 }
