@@ -364,10 +364,10 @@ volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefil
   return(plot)
 }
 
-#' Title
+#' ggpairs plot with extra highlight on a specific column
 #'
-#' @param log2 log2 protein abundances table
-#' @param datamined datamined table
+#' @param log2 log2 protein abundances table; with "name" column which is the protein/gene identifier
+#' @param datamined datamined table, with the exact same column "name"
 #' @param column2highlight factor or logistic column to highlight plots
 #'
 #' @return exploratory plots from ggpairs
