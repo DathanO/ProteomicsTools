@@ -1,6 +1,6 @@
 #' Creates MDS Plot from Log2 Protein Abundances to show how the different methods are close to each other
 #'
-#' @param log2 your first table with log2 normalized data of protein abundances
+#' @param log2 your first table with log2 normalized data of protein abundances, with a "name" column of your identifiers
 #' @param rows If True, rownames will take the first column and delete it from the data frame
 #' @return A MDS Plot of your methods
 #' @export
@@ -22,7 +22,7 @@ myMDSplot <- function(log2, rows = TRUE) {
 
 #' Automatize pairwise t.test of your data.
 #'
-#' @param df A data.frame with protein abundances
+#' @param df A data.frame with protein abundances, with a "name" column of your identifiers
 #' @param padj A string parameter defining the correction methods. See ?p.adjust
 #' @export
 #' @return A table of pairwise t.test of 2 times your amount of methods
@@ -60,7 +60,7 @@ mypairwise_t <- function(df, padj="fdr") {
 #'
 #' @examples data("ttest")
 #' myvenndiagram(ttest)
-myvenndiagram <- function(output_ttest, path="examples/", saveplot=FALSE) {
+myvenndiagram <- function(output_ttest, path="", saveplot=FALSE) {
   methods <- unique(unlist(strsplit(colnames(output_ttest), "_vs_")))
   pairs <- colnames(output_ttest)
   for (method in methods) {
@@ -159,7 +159,7 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
 
 #' This function makes the mean of your replicates for each methods
 #'
-#' @param df with protein abundances
+#' @param df with protein abundances, with a "name" column of your identifiers
 #'
 #' @return A data.frame of the mean of each method
 #' @export
@@ -257,7 +257,7 @@ volcano_maker <- function(ttest, foldc, datamined, binarycol, threshold=5, namef
 }
 
 
-#' Title
+#' Make Heatmap of your protein abundances table
 #'
 #' @param num_df A df with numeric values
 #' @param scale_data A logical parameter scaling your data or not. Note that data should be scaled.
@@ -277,7 +277,7 @@ heatmap_maker <- function(num_df, scale_data=TRUE) {
   }
 }
 
-#' Title
+#' Enrichment plot of your data
 #'
 #' @param ftest The output of fishertest()
 #' @param path will define directory to store output. by default, files are saved within wd
@@ -287,7 +287,7 @@ heatmap_maker <- function(num_df, scale_data=TRUE) {
 #' @import tidyr
 #' @examples data("ftest")
 #' dotplot_maker(fisher_subcell, width=25, height=10)
-dotplot_maker <- function(ftest, namefile="FisherDotPlot_Enrichment.png", path="examples/", width = 25, height = 6, saveplot=FALSE) {
+dotplot_maker <- function(ftest, namefile="FisherDotPlot_Enrichment.png", path="", width = 25, height = 6, saveplot=FALSE) {
   results <- ftest[ftest$padj<0.05,]
   result <- magrittr::"%>%"(results, tidyr::separate(., Table, c("Mined", "Pair"), sep = "_X_"))
   plot <- ggplot2::ggplot(result, ggplot2::aes(x=Pair, y=Mined, color=padj, size=gene.ratio)) +
@@ -329,9 +329,9 @@ col_sorted <- function(data) {
 
 #' Compare your volcano plots together
 #'
-#' @param ttest output of mypairwise_t
-#' @param foldc output of myfoldchange
-#' @param datamined dataframe with a logical variable to highlight
+#' @param ttest output of mypairwise_t, with a "name" column of your identifiers
+#' @param foldc output of myfoldchange, with a "name" column of your identifiers
+#' @param datamined dataframe with a logical variable to highlight, with a "name" column of your identifiers
 #' @param binarycol the variable to highlight
 #' @param path will define directory to store output. by default, files are saved within wd
 #' @param threshold should depend on the p.value adjustment, you can adapt it to your data
@@ -343,7 +343,7 @@ col_sorted <- function(data) {
 #' @examples data("ttest")
 #' data("foldc")
 #' volcano_all(ttest, foldc, datamined, "Groups.of.TM")
-volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefile="Volcano_", path="examples/", width=40, height=6, saveplot=FALSE) {
+volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefile="Volcano_", path="", width=40, height=6, saveplot=FALSE) {
   ttestL <- col_sorted(ttest)
   foldcL <- col_sorted(foldc)
   table <- merge(ttestL, foldcL, by=c("name", "variable"))
