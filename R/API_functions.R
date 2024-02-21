@@ -267,7 +267,7 @@ column_maker <- function(df, colname2check, newcolname) {
 transmembrane_factor <- function(df, colname, newcolname, treshold = 3) {
   middle <- paste0("1-", treshold)
   high <- paste0(">", treshold)
-  df[[newcolname]] <- ifelse(datamined[[colname]] > 0, ifelse(datamined[[colname]] <= treshold, middle, high), "0")
+  df[[newcolname]] <- ifelse(df[[colname]] > 0, ifelse(df[[colname]] <= treshold, middle, high), "0")
   df[[newcolname]] <- as.factor(df[[newcolname]])
   return(df)
 }
