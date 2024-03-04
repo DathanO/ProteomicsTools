@@ -151,7 +151,7 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
   }
   results$True_True <- as.numeric(results$True_True)
   results$False_True <- as.numeric(results$False_True)
-  results$gene.ratio <- as.numeric(results$True_True) / as.numeric((results$True_True + results$False_True))
+  results$Protein.Ratio <- as.numeric(results$True_True) / as.numeric((results$True_True + results$False_True))
   results$padj <- p.adjust(results$pval_fisher, padj)
   return(results)
 }
@@ -290,7 +290,7 @@ heatmap_maker <- function(num_df, scale_data=TRUE) {
 dotplot_maker <- function(ftest, namefile="FisherDotPlot_Enrichment.png", path="", width = 25, height = 6, saveplot=FALSE) {
   results <- ftest[ftest$padj<0.05,]
   result <- magrittr::"%>%"(results, tidyr::separate(., Table, c("Mined", "Pair"), sep = "_X_"))
-  plot <- ggplot2::ggplot(result, ggplot2::aes(x=Pair, y=Mined, color=padj, size=gene.ratio)) +
+  plot <- ggplot2::ggplot(result, ggplot2::aes(x=Pair, y=Mined, color=padj, size=Protein.Ratio)) +
     ggplot2::geom_point() +
     ggplot2::scale_color_gradient(low="red", high="blue") +
     ggplot2::theme_classic() +
