@@ -130,8 +130,6 @@ reformat_table <- function(df, padj="fdr", treshold=0.05) {
 #' @export
 #'
 #' @examples data("ttest")
-#' # taille du points: nombre de gene T_T
-#' # couleur du point: p.value
 #' data("datamined")
 #' fishertest(reformat_table(datamined), reformat_table(ttest), "fdr")
 fishertest <- function(df_mined, ttest_logical, padj = "none") {
