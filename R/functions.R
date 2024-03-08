@@ -382,3 +382,40 @@ ggpairs_proteomics <- function(log2, datamined, column2highlight) {
                   title=plottitle) + ggplot2::theme(axis.text = element_text(size = 8))
 }
 
+#' create a dotplot colored by Zscore and sized by the percent of abundance
+#'
+#' @param logistictable a dataframe with mined data contained as logistic variables; with protein/gene name as "name"
+#' @param log2 a dataframe with protein abundances; with protein/gene name as "name"
+#' @param saveplot if True, the plot will be saved
+#' @param namefile the name of the plot to save if saveplot=True
+#' @param path the path of the output to save if saveplot=True
+#' @param width the width of the plot to save if saveplot=True
+#' @param height the height of the plot to save if saveplot=True
+#'
+#' @return dotplot; saved or not
+#' @export
+#'
+#' @examples dotplot_by_methods(logistic_mined_data, log2)
+dotplot_by_methods <- function(logistictable, log2, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
+  table <- melt(mean_function(log2))
+  table$Zscore <- ave(table$value, table$variable, FUN = function(x) ((x-mean(x))/sd(x)))
+  table$percent <- ave(table$value, table$variable, FUN = function(x) ((x - min(x)) / (max(x) - min(x))) * 100)
+  logistic2plot <- melt(logistictable, "name")
+  table2plot <- merge(logistic2plot, table, by="name")
+  table2plot <- table2plot[table2plot$value.x==TRUE,]
+  plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y, color=Zscore, size=percent)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_color_gradient(low="red", high="blue") +
+    ggplot2::theme_classic() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
+    ggplot2::xlab("Variables") +
+    ggplot2::ylab("Methods") +
+    ggplot2::ggtitle("DotPlot by Zscore and abundance percent") +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
+                   panel.grid.major = ggplot2::element_line(size = 0.15, linetype = 'solid', colour = 'white'))
+  if (saveplot) {
+    filename <- paste(path, namefile, sep="")
+    ggplot2::ggsave(filename, width = width, height = height, limitsize = FALSE)
+  }
+  plot
+}

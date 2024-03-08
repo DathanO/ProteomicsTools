@@ -21,8 +21,6 @@ Makes a Fisher Exact Test to get enrichment of your logical columns
 }
 \examples{
 data("ttest")
-# taille du points: nombre de gene T_T
-# couleur du point: p.value
 data("datamined")
 fishertest(reformat_table(datamined), reformat_table(ttest), "fdr")
 }

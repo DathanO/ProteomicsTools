@@ -271,3 +271,28 @@ transmembrane_factor <- function(df, colname, newcolname, treshold = 3) {
   df[[newcolname]] <- as.factor(df[[newcolname]])
   return(df)
 }
+
+#' Transform glycosylation enrichment as a logisitc table enumrating O & N glycosylation
+#'
+#' @param table the dataframe containing the glycosylation site from neXtProt
+#' @param colname the colname of interest
+#'
+#' @return a new dataframe, with 2 logistic column O_linked and N_linked
+#' @export
+#'
+#' @examples extract_glyco_string(datamined, "Glycosite")
+extract_glyco_string <- function(table, colname) {
+  extract_glycosylation <- function(glyco_string) {
+    if (grepl("N-linked", glyco_string)) {
+      return("N-linked")
+    } else if (grepl("O-linked", glyco_string)) {
+      return("O-linked")
+    } else {
+      return(NA)
+    }
+  }
+  glyco_types <- sapply(table[[colname]], extract_glycosylation)
+  table$O_linked <- grepl("O-linked", glyco_types)
+  table$N_linked <- grepl("N-linked", glyco_types)
+  return(table)
+}
