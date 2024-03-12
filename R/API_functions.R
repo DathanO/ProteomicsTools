@@ -185,7 +185,7 @@ uniprot_assembling <- function(df) {
   # first please choose a dataframe containing the gene.names in first column
   data2assemble <- data.frame(name=df[,1], UniProtID=rep(NA, length(df[,1])), stringsAsFactors=FALSE)
   data2assemble$UniProtID <- unlist(pbapply::pblapply(data2assemble$name, function(gene) get_swissprot_id(gene)))
-  return(data2assemble)
+  return(na.omit(data2assemble))
 }
 
 #' Incorporate a new column from the datamining functions above
@@ -203,7 +203,7 @@ datamining_assembling <- function(df, colname, fun) {
   data2assemble <- df
   data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) fun(prot)))
   names(data2assemble)[names(data2assemble) == "column"] <- colname
-  return(data2assemble)
+  return(na.omit(data2assemble))
 }
 
 #' Choose which proteins to analyze from MaxQuant format

@@ -396,13 +396,19 @@ ggpairs_proteomics <- function(log2, datamined, column2highlight) {
 #' @export
 #'
 #' @examples dotplot_by_methods(logistic_mined_data, log2)
-dotplot_by_methods <- function(logistictable, log2, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
+dotplot_by_methods <- function(logistictable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
   table <- melt(mean_function(log2))
   table$Zscore <- ave(table$value, table$variable, FUN = function(x) ((x-mean(x))/sd(x)))
   table$percent <- ave(table$value, table$variable, FUN = function(x) ((x - min(x)) / (max(x) - min(x))) * 100)
   logistic2plot <- melt(logistictable, "name")
-  table2plot <- merge(logistic2plot, table, by="name")
-  table2plot <- table2plot[table2plot$value.x==TRUE,]
+  tableforplot <- merge(logistic2plot, table, by="name")
+  tableforplot <- tableforplot[tableforplot$value.x==TRUE,]
+  tableforplot <- subset(tableforplot, select = -value.y)
+  table2plot <- unique(within(tableforplot, {
+    Zscore <- ave(Zscore, variable.y, variable.x, FUN = mean)
+    percent <- ave(percent, variable.y, variable.x, FUN = mean)
+  }))
+  if (mean_computing==FALSE) {table2plot <- tableforplot}
   plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y, color=Zscore, size=percent)) +
     ggplot2::geom_point() +
     ggplot2::scale_color_gradient(low="red", high="blue") +
@@ -412,7 +418,7 @@ dotplot_by_methods <- function(logistictable, log2, saveplot=FALSE, namefile="Do
     ggplot2::ylab("Methods") +
     ggplot2::ggtitle("DotPlot by Zscore and abundance percent") +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
-                   panel.grid.major = ggplot2::element_line(size = 0.15, linetype = 'solid', colour = 'white'))
+                   panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
   if (saveplot) {
     filename <- paste(path, namefile, sep="")
     ggplot2::ggsave(filename, width = width, height = height, limitsize = FALSE)
