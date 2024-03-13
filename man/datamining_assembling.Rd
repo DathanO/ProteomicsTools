@@ -20,5 +20,5 @@ df containing the new column
 Incorporate a new column from the datamining functions above
 }
 \examples{
-datamining_assembling(test, "PI", get_nextprot_PI)
+datamining_assembling(head(datamined), "PI", get_nextprot_PI)
 }

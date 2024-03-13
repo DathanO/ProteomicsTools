@@ -255,14 +255,29 @@ get_nextprot_mass("P01023")
 get_nextprot_transmembrane("P01023")
 get_nextprot_glycosite("P01023")
 get_nextprot_subcell("P01023")
+get_nextprot_coiledcoil("P01023")
+get_nextprot_lipidationsite("P01023")
+get_nextprot_zincfinger("P01023")
 ```
 
-You can also use another function in combination to apply to your column, which works for all above functions:
+If the annotation you want is not present there, you can use the general function that count the number of the annotation of interest:
+
+```{r, cache=TRUE}
+get_nextprot_annotationsnumber("P01023", "catalytic-activity")
+```
+
+
+You can also use another function in combination to apply to your column, which works for all functions above:
 
 ```{r, cache=TRUE}
 datamining_assembling(head(subset(datamined, select = c(1:2))), "Subcell", get_nextprot_subcell)
 ```
 
+For the general one, there is a supplementary parameter, so you can use this function:
+
+```{r, cache=TRUE}
+datamining_annotationsnumber(head(subset(datamined, select = c(1:2))), get_nextprot_annotationsnumber, "catalytic-activity")
+```
 
 As you can see, if you mine subcellular location and glycosylation site you will get strings columns. You can use the function below to transform this column into a new table:
 

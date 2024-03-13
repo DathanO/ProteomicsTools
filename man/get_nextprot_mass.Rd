@@ -7,7 +7,7 @@
 get_nextprot_mass(protname)
 }
 \arguments{
-\item{protname}{}
+\item{protname}{UniProtID}
 }
 \value{
 Mass (Da)

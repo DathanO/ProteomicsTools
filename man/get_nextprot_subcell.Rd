@@ -7,7 +7,7 @@
 get_nextprot_subcell(protname)
 }
 \arguments{
-\item{protname}{}
+\item{protname}{UniProtID}
 }
 \value{
 subcellular location(s) in strings

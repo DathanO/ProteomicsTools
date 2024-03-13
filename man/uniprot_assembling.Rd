@@ -7,7 +7,7 @@
 uniprot_assembling(df)
 }
 \arguments{
-\item{df}{containing gene names in first column}
+\item{df}{containing gene names in first columnx§}
 }
 \value{
 df containing UniProtID
@@ -16,5 +16,5 @@ df containing UniProtID
 Create a table traducing gene name into canonical UniProtID
 }
 \examples{
-uniprot_assembling(big)
+uniprot_assembling(head(datamined))
 }

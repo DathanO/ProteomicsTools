@@ -7,6 +7,7 @@
 dotplot_by_methods(
   logistictable,
   log2,
+  mean_computing = TRUE,
   saveplot = FALSE,
   namefile = "DotPlot.png",
   path = "",

@@ -49,7 +49,7 @@ get_nextprot_PI <- function(protname) {
 
 #' get protein mass
 #'
-#' @param protname
+#' @param protname UniProtID
 #'
 #' @return Mass (Da)
 #' @export
@@ -92,14 +92,19 @@ get_nextprot_transmembrane <- function(protname) {
     json_data <- httr::content(response, as = "text")
     # Parse JSON data into an R object
     parsed_data <- (jsonlite::fromJSON(json_data))
-    annotationgold <- parsed_data$entry$annotationsByCategory
-    return(as.integer(sum(annotationgold$`transmembrane-region`$qualityQualifier=="GOLD")))
+    data2mine <- parsed_data$entry$annotationsByCategory$`transmembrane-region`
+    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
+    if (is.null(data2mine)) {
+      print(0)
+      return(0)
+    } else {return(nrow(data2mine))}
   } else {return(NA)}
 }
 
+
 #' Get subcellular locations
 #'
-#' @param protname
+#' @param protname UniProtID
 #'
 #' @return subcellular location(s) in strings
 #' @export
@@ -147,7 +152,7 @@ table_maker_from_strings <- function(csv_column, df=NULL) {
 
 #' get glycosylation for a given protein
 #'
-#' @param protname
+#' @param protname UniProtID
 #'
 #' @return the type of glycosylation in strings or vector if few
 #' @export
@@ -172,15 +177,125 @@ get_nextprot_glycosite <- function(protname) {
   } else {return(NA)}
 }
 
+#' Get number of coiled-coil of the protein
+#'
+#' @param protname UniProtID
+#'
+#' @return number of coiled-coil
+#' @export
+#'
+#' @examples get_nextprot_coiledcoil("Q99996")
+get_nextprot_coiledcoil <- function(protname) {
+  # Nextprot API endpoint and ProteinID
+  api_endpoint <- "https://api.nextprot.org/entry/"
+  api_end <- "/coiled-coil-region.json"
+  protein_id <- paste0("NX_", protname)
+  # Send the API request and retrieve the JSON data
+  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
+  if (response$status_code == 200) {
+    json_data <- httr::content(response, as = "text")
+    # Parse JSON data into an R object
+    parsed_data <- (jsonlite::fromJSON(json_data))
+    data2mine <- parsed_data$entry$annotationsByCategory$`coiled-coil`
+    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
+    if (is.null(data2mine)) {
+      return(0)
+    } else return(nrow(data2mine))
+    #return(result)
+  } else {return(NA)}
+}
+
+#' Title Get number of lipidation site of the protein
+#'
+#' @param protname UniProtID
+#'
+#' @return number of lipidation site
+#' @export
+#'
+#' @examples get_nextprot_lipidationsite("Q14254")
+get_nextprot_lipidationsite <- function(protname) {
+  # Nextprot API endpoint and ProteinID
+  api_endpoint <- "https://api.nextprot.org/entry/"
+  api_end <- "/lipidation-site.json"
+  protein_id <- paste0("NX_", protname)
+  # Send the API request and retrieve the JSON data
+  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
+  if (response$status_code == 200) {
+    json_data <- httr::content(response, as = "text")
+    # Parse JSON data into an R object
+    parsed_data <- (jsonlite::fromJSON(json_data))
+    data2mine <- parsed_data$entry$annotationsByCategory$`lipidation-site`
+    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
+    if (is.null(data2mine)) {
+      return(0)
+    } else {return(nrow(data2mine))}
+    #return(result)
+  } else {return(NA)}
+}
+
+#' Title Get number of Zinc-Finger region of the protein
+#'
+#' @param protname UniProtID
+#'
+#' @return number of zinc-finger region
+#' @export
+#'
+#' @examples get_nextprot_zincfinger("O14686")
+get_nextprot_zincfinger <- function(protname) {
+  # Nextprot API endpoint and ProteinID
+  api_endpoint <- "https://api.nextprot.org/entry/"
+  api_end <- "/zinc-finger-region.json"
+  protein_id <- paste0("NX_", protname)
+  # Send the API request and retrieve the JSON data
+  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
+  if (response$status_code == 200) {
+    json_data <- httr::content(response, as = "text")
+    # Parse JSON data into an R object
+    parsed_data <- (jsonlite::fromJSON(json_data))
+    data2mine <- parsed_data$entry$annotationsByCategory$`zinc-finger-region`
+    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
+    if (is.null(data2mine)) {
+      return(0)
+    } else {return(nrow(data2mine))}
+  } else {return(NA)}
+}
+
+#' Title General function to mine integer annotations (number of TM domains, catalytic activity...)
+#'
+#' @param protname UniProtID
+#' @param name_of_annotation name of the string (separated with "-")
+#'
+#' @return the number of annotations
+#' @export
+#'
+#' @examples get_nextprot_annotationsnumber("O15118", "transmembrane-region")
+get_nextprot_annotationsnumber <- function(protname, name_of_annotation) {
+  # Nextprot API endpoint and ProteinID
+  api_endpoint <- "https://api.nextprot.org/entry/"
+  api_end <- paste0("/", name_of_annotation, ".json")
+  protein_id <- paste0("NX_", protname)
+  # Send the API request and retrieve the JSON data
+  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
+  if (response$status_code == 200) {
+    json_data <- httr::content(response, as = "text")
+    # Parse JSON data into an R object
+    parsed_data <- (jsonlite::fromJSON(json_data))
+    data2mine <- parsed_data$entry$annotationsByCategory[[name_of_annotation]]
+    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
+    if (is.null(data2mine)) {
+      return(0)
+    } else {return(nrow(data2mine))}
+  } else {return(NA)}
+}
 
 #' Create a table traducing gene name into canonical UniProtID
 #'
-#' @param df containing gene names in first column
+#' @param df containing gene names in first columnx§
 #'
 #' @return df containing UniProtID
 #' @export
 #' @import pbapply
-#' @examples uniprot_assembling(big)
+#' @examples uniprot_assembling(head(datamined))
 uniprot_assembling <- function(df) {
   # first please choose a dataframe containing the gene.names in first column
   data2assemble <- data.frame(name=df[,1], UniProtID=rep(NA, length(df[,1])), stringsAsFactors=FALSE)
@@ -197,12 +312,31 @@ uniprot_assembling <- function(df) {
 #' @return df containing the new column
 #' @export
 #' @import pbapply
-#' @examples datamining_assembling(test, "PI", get_nextprot_PI)
+#' @examples datamining_assembling(head(datamined), "PI", get_nextprot_PI)
 datamining_assembling <- function(df, colname, fun) {
   # first please choose a dataframe containing "UniProtID" as colname
   data2assemble <- df
   data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) fun(prot)))
   names(data2assemble)[names(data2assemble) == "column"] <- colname
+  return(na.omit(data2assemble))
+}
+
+#' Incorporate a new column from the datamining function "get_nextprot_annotationsnumber")
+#'
+#' @param df containing "UniProtID" as colname
+#' @param colname in strings of the datamined column
+#' @param fun name of the function to use
+#' @param annotation name of the annotation parameter of the function to use
+#'
+#' @return df containing the new column
+#' @export
+#' @import pbapply
+#' @examples datamining_annotationsnumber(head(datamined), "catalytic_activity", get_nextprot_annotationsnumber, "catalytic-activity")
+datamining_annotationsnumber <- function(df, fun, annotation) {
+  # first please choose a dataframe containing "UniProtID" as colname
+  data2assemble <- df
+  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) fun(prot, annotation)))
+  names(data2assemble)[names(data2assemble) == "column"] <- sub("^([a-z])", "\\U\\1", gsub("-", "_", annotation), perl = TRUE)
   return(na.omit(data2assemble))
 }
 

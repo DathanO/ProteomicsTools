@@ -7,7 +7,7 @@
 get_nextprot_glycosite(protname)
 }
 \arguments{
-\item{protname}{}
+\item{protname}{UniProtID}
 }
 \value{
 the type of glycosylation in strings or vector if few
