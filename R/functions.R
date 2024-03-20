@@ -92,6 +92,8 @@ myvenndiagram <- function(output_ttest, path="", saveplot=FALSE) {
 replicates_factor <- function(df, sep="_") {
   longdf <- reshape2::melt(df)
   final <- magrittr::"%>%"(longdf, tidyr::separate(., variable, c("Method", "Replicates"), sep = sep))
+  final$Method <- as.factor(final$Method)
+  final$Replicates <- as.factor(final$Replicates)
   return(final)
 }
 
