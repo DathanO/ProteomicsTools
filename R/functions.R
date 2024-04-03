@@ -140,12 +140,14 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
     if (is.logical(df_mined[,ncol]) == TRUE) {
       for (colsign in 1:length(ttest_logical)) {
         conting <- table(ttest_logical[,colsign], df_mined[,ncol])
-        ftest <- stats::fisher.test(conting, simulate.p.value = TRUE)
-        varname <- paste(list(colnames(df_mined[ncol])), list(colnames(ttest_logical[colsign])), sep="_X_")
-        pval <- ftest$p.value
-        vec <- cbind(varname, conting[1,1], conting[1,2], conting[2,1], conting[2,2], pval)
-        colnames(vec) <- c("Table", "False_False", "False_True", "True_False", "True_True", "pval_fisher")
-        results <- rbind(results, vec)
+        if (all(dim(conting) == c(2, 2))) {
+          ftest <- stats::fisher.test(conting, simulate.p.value = TRUE)
+          varname <- paste(list(colnames(df_mined[ncol])), list(colnames(ttest_logical[colsign])), sep="_X_")
+          pval <- ftest$p.value
+          vec <- cbind(varname, conting[1,1], conting[1,2], conting[2,1], conting[2,2], pval)
+          colnames(vec) <- c("Table", "False_False", "False_True", "True_False", "True_True", "pval_fisher")
+          results <- rbind(results, vec)
+        }
       }
     }
   }
@@ -292,14 +294,15 @@ dotplot_maker <- function(ftest, namefile="FisherDotPlot_Enrichment.png", path="
   result <- magrittr::"%>%"(results, tidyr::separate(., Table, c("Mined", "Pair"), sep = "_X_"))
   plot <- ggplot2::ggplot(result, ggplot2::aes(x=Pair, y=Mined, color=padj, size=Protein.Ratio)) +
     ggplot2::geom_point() +
-    ggplot2::scale_color_gradient(low="red", high="blue") +
+    ggplot2::scale_color_gradient(name="P-Value adjusted", low="red", high="blue") +
+    ggplot2::scale_size(name="Protein Ratio\nsignificative\nto both T-Test\nand Mined Property", guide=guide_legend(title.theme=element_text(size=8))) +
     ggplot2::theme_classic() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
-    ggplot2::xlab("Pairs of Methods") +
+    ggplot2::xlab("Methods") +
     ggplot2::ylab("Mined Properties") +
     ggplot2::ggtitle("DotPlot [Enrichment Results]") +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
-                   panel.grid.major = ggplot2::element_line(size = 0.15, linetype = 'solid', colour = 'white'))
+                   panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
   plot
   if (saveplot) {
     filename <- paste(path, namefile, sep="")
@@ -426,4 +429,187 @@ dotplot_by_methods <- function(logistictable, log2, mean_computing=TRUE, saveplo
     ggplot2::ggsave(filename, width = width, height = height, limitsize = FALSE)
   }
   plot
+}
+
+#' Compute T-Test of one method against all others per protein
+#'
+#' @param df log2 protein abundance matrix
+#' @param padj p.adjustment method
+#'
+#' @return ttest matrix of each method
+#' @export
+#' @import stats
+#' @examples compute_ttest(log2)
+compute_ttest <- function(df, padj="fdr") {
+  df <- replicates_factor(df)
+  vectormethod <- sort(unique(df$Method))
+  vectorgene <- unique(df$name)
+  compare_one_method <- function(method) {
+    pergene <- function(gene) {
+      df <- df[df$name == gene,]
+      current_method_data <- df[df$Method == method, ]
+      other_methods_data <- df[df$Method != method, ]
+      other_means <- aggregate(value ~ name, other_methods_data, mean)
+      comparison_data <- merge(current_method_data, other_means, by="name", suffixes = c("_current", "_other_mean"))
+      t_tests <- melt(stats::t.test(comparison_data$value_current, comparison_data$value_other_mean)$p.value)
+      p_adjusted <- p.adjust(t_tests, method = padj)
+      return(p_adjusted)
+    }
+    results <- Reduce(rbind, Map(pergene, vectorgene))
+    return(results)
+  }
+  results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
+  rownames(results_df) <- vectorgene
+  colnames(results_df) <- vectormethod
+  return(results_df)
+}
+
+
+#' Compare the mean of one method against all others per protein
+#'
+#' @param df log2 protein abundance matrix
+#' @param padj p.adjustment method
+#'
+#' @return mean differences matrix
+#' @export
+#'
+#' @examples mean_diff_methods(log2)
+mean_diff_methods <- function(df, padj="fdr") {
+  df <- replicates_factor(df)
+  vectormethod <- sort(unique(df$Method))
+  vectorgene <- unique(df$name)
+  compare_one_method <- function(method) {
+    pergene <- function(gene) {
+      df_subset <- df[df$name == gene,]
+      current_method_data <- df_subset[df_subset$Method == method, ]
+      other_methods_data <- df_subset[df_subset$Method != method, ]
+      other_means <- aggregate(value ~ name, other_methods_data, mean)
+      comparison_data <- merge(current_method_data, other_means, by="name", suffixes = c("_current", "_other_mean"))
+      mean_difference <- mean(comparison_data$value_current) - mean(comparison_data$value_other_mean)
+      return(data.frame(mean_difference))
+    }
+    results <- Reduce(rbind, Map(pergene, vectorgene))
+    names(results) <- c("mean_difference")
+    return(results)
+  }
+  results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
+  rownames(results_df) <- vectorgene
+  colnames(results_df) <- vectormethod
+  return(results_df)
+}
+
+
+#' Create a Plot of the difference of the means after using T-Test and MeanDiff
+#'
+#' @param tablettest output of compute_ttest()
+#' @param tablemean output of mean_diff_methods()
+#' @param minedproperties logistic table of mined properties
+#' @param saveplot True/False to save the plot in the desired path
+#' @param namefile name of the output file if saved
+#' @param path path of the output file if saved
+#' @param width width of the output file if saved
+#' @param height height of the output file if saved
+#'
+#' @return plot
+#' @export
+#' @import ggplot2
+#' @import reshape2
+#' @examples meandifftesting(meantt, meandiff, glycolink)
+meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FALSE, namefile="MeanDifferenceDotPlot", path="", width=10, height=10) {
+  tablettest$name <- rownames(tablettest)
+  tablemean$name <- rownames(tablemean)
+  tablettest <- reshape2::melt(tablettest, id.vars = "name")
+  tablemean <- reshape2::melt(tablemean, id.vars = "name")
+  minedproperties <- reshape2::melt(minedproperties, id.vars = "name")
+  firstmerge <- merge(tablettest, tablemean, by = c("name", "variable"))
+  table2plot <- merge(firstmerge, minedproperties, by = "name")
+  table2plot <- table2plot[table2plot$value==TRUE,]
+  table2plot <- table2plot[table2plot$value.x < 0.05,]
+  table2plot <- within(table2plot, {
+    P.Value <- ave(value.x, variable.x, variable.y)
+    MeanDiff <- ave(value.y, variable.x, variable.y)
+    MeanDiffBinary <- as.factor(ifelse(MeanDiff<0, "Down", "Up"))
+    Test <- as.factor(ifelse(value.y<0, "Down", "Up"))
+  })
+  plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y, col=P.Value, size=MeanDiff, shape=MeanDiffBinary)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_color_gradient(name="Adjusted P-Value", low="red", high="yellow") +
+    ggplot2::scale_size(name="Mean Differences\n(Average)") +
+    ggplot2::scale_shape(name="Mean Differences\nabove or below 0") +
+    ggplot2::theme_classic() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
+    ggplot2::xlab("Variables") +
+    ggplot2::ylab("Methods") +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
+                   panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
+  plot
+  if (saveplot) {
+    filename <- paste(path, namefile, ".png", sep="")
+    ggplot2::ggsave(filename, width = width, height = height)
+  }
+  return(plot)
+}
+
+#' Create a simple dotplot around the max and min values per method
+#'
+#' @param logistictable logistic table of the mined properties
+#' @param log2 log2 protein abundances matrix
+#' @param mean_computing True/False; if True, you will get average values to get one color for the dot. If False, applies a gradient within each dot based on values.
+#' @param saveplot True/False to save the plot in the desired path
+#' @param namefile name of the output file if saved
+#' @param path path of the output file if saved
+#' @param width width of the output file if saved
+#' @param height height of the output file if saved
+#'
+#' @return dotplot around the max and min values per method
+#' @export
+#'
+#' @import ggplot2
+#' @importFrom dplyr summarise group_by
+#'
+#' @examples dotratio(subcell, log2)
+dotratio <- function(logistictable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
+  table <- replicates_factor(log2)
+  table$ratio <- ave(table$value, table$Method, FUN = function(x) ((x - min(x)) / (max(x) - min(x))) * 100)
+  logistic2plot <- reshape2::melt(logistictable, "name")
+  colnames(logistic2plot) <- c("name", "annotations", "logical")
+  tableforplot <- merge(logistic2plot, table, by="name")
+  tableforplot <- tableforplot[tableforplot$logical == TRUE,]
+  range_values <- dplyr::summarise(
+    dplyr::group_by(tableforplot, annotations),
+    overall_max = max(value),
+    overall_min = min(value),
+    .groups = 'drop'
+  )
+  method_max <- dplyr::summarise(
+    dplyr::group_by(tableforplot, annotations, Method),
+    method_max = max(value),
+    .groups = 'drop'
+  )
+  mean_ratios <- dplyr::summarise(
+    dplyr::group_by(tableforplot, annotations, Method),
+    mean_percent_ratio = mean(ratio),
+    .groups = 'drop'
+  )
+  merged_data <- merge(method_max, range_values, by = "annotations")
+  merged_data <- merge(merged_data, mean_ratios, by = c("annotations", "Method"))
+  merged_data <- within(merged_data, {
+    normalized_proportion <- (method_max - overall_min) / (overall_max - overall_min)
+    Zscore <- ave(mean_percent_ratio, annotations, FUN = function(x) ((x - mean(x)) / sd(x)))
+  })
+  plot <- ggplot2::ggplot(merged_data, ggplot2::aes(x = annotations, y = Method, size = normalized_proportion, color = Zscore)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_color_gradient(low = "yellow", high = "red") +
+    ggplot2::theme_classic() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust = 1)) +
+    ggplot2::xlab("Variables") +
+    ggplot2::ylab("Methods") +
+    ggplot2::ggtitle("DotPlot by Zscore and abundance ratio") +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
+                   panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
+  if (saveplot) {
+    filename <- paste(path, namefile, sep = "")
+    ggplot2::ggsave(filename, plot = plot, width = width, height = height, limitsize = FALSE)
+  }
+  return(plot)
 }

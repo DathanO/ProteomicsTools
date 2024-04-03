@@ -430,3 +430,32 @@ extract_glyco_string <- function(table, colname) {
   table$N_linked <- grepl("N-linked", glyco_types)
   return(table)
 }
+
+#' Combine all the membrane terms from the Subcell Table
+#'
+#' @param df output of table_maker_from_strings(data$Subcell, data)
+#'
+#' @return the same table but with all the Membrane columns grouped in one
+#' @export
+#'
+#' @examples combineMembraneColumns(subcell)
+combineMembraneColumns <- function(df) {
+  # Ensure there's a "Membrane" column, initialize as FALSE if it doesn't exist
+  if (!"Membrane" %in% names(df)) {
+    df$Membrane <- FALSE
+  }
+
+  # Identify all columns that contain the word "membrane", excluding the exact "Membrane"
+  membrane_cols <- grep("membrane", names(df), ignore.case = TRUE, value = TRUE)
+  membrane_cols <- membrane_cols[membrane_cols != "Membrane"]
+
+  # Combine all "membrane" related columns into the "Membrane" column
+  for(col in membrane_cols) {
+    df$Membrane <- df$Membrane | df[[col]]
+  }
+
+  # Drop the original "membrane" columns, keeping the updated "Membrane"
+  df <- df[, !(names(df) %in% membrane_cols)]
+
+  return(df)
+}
