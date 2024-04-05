@@ -525,17 +525,18 @@ meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FAL
     P.Value <- ave(value.x, variable.x, variable.y)
     MeanDiff <- ave(value.y, variable.x, variable.y)
     MeanDiffBinary <- as.factor(ifelse(MeanDiff<0, "Down", "Up"))
-    Test <- as.factor(ifelse(value.y<0, "Down", "Up"))
   })
-  plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y, col=P.Value, size=MeanDiff, shape=MeanDiffBinary)) +
-    ggplot2::geom_point() +
+  plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y)) +
+    ggplot2::geom_point(aes(col=P.Value, size=MeanDiff, shape=MeanDiffBinary, fill=P.Value)) +
     ggplot2::scale_color_gradient(name="Adjusted P-Value", low="red", high="yellow") +
+    ggplot2::scale_fill_gradient(low="red", high="yellow") +
     ggplot2::scale_size(name="Mean Differences\n(Average)") +
-    ggplot2::scale_shape(name="Mean Differences\nabove or below 0") +
+    ggplot2::scale_shape_manual(name="Mean Differences\nabove or below 0", values=c("Up"=24, "Down"=25)) +
     ggplot2::theme_classic() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
     ggplot2::xlab("Variables") +
     ggplot2::ylab("Methods") +
+    ggplot2::guides(fill=guide_none()) +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
                    panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
   plot
