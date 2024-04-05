@@ -5,7 +5,7 @@
 \title{create a dotplot colored by Zscore and sized by the percent of abundance}
 \usage{
 dotplot_by_methods(
-  logistictable,
+  logicaltable,
   log2,
   mean_computing = TRUE,
   saveplot = FALSE,
@@ -16,7 +16,7 @@ dotplot_by_methods(
 )
 }
 \arguments{
-\item{logistictable}{a dataframe with mined data contained as logistic variables; with protein/gene name as "name"}
+\item{logicaltable}{a dataframe with mined data contained as logical variables; with protein/gene name as "name"}
 
 \item{log2}{a dataframe with protein abundances; with protein/gene name as "name"}
 
@@ -37,5 +37,5 @@ dotplot; saved or not
 create a dotplot colored by Zscore and sized by the percent of abundance
 }
 \examples{
-dotplot_by_methods(logistic_mined_data, log2)
+dotplot_by_methods(logical_mined_data, log2)
 }

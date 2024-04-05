@@ -11,7 +11,7 @@ ggpairs_proteomics(log2, datamined, column2highlight)
 
 \item{datamined}{datamined table, with the exact same column "name"}
 
-\item{column2highlight}{factor or logistic column to highlight plots}
+\item{column2highlight}{factor or logical column to highlight plots}
 }
 \value{
 exploratory plots from ggpairs

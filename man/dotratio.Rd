@@ -5,7 +5,7 @@
 \title{Create a simple dotplot around the max and min values per method}
 \usage{
 dotratio(
-  logistictable,
+  logicaltable,
   log2,
   mean_computing = TRUE,
   saveplot = FALSE,
@@ -16,7 +16,7 @@ dotratio(
 )
 }
 \arguments{
-\item{logistictable}{logistic table of the mined properties}
+\item{logicaltable}{logical table of the mined properties}
 
 \item{log2}{log2 protein abundances matrix}
 

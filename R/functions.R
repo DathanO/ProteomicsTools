@@ -371,7 +371,7 @@ volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefil
 #'
 #' @param log2 log2 protein abundances table; with "name" column which is the protein/gene identifier
 #' @param datamined datamined table, with the exact same column "name"
-#' @param column2highlight factor or logistic column to highlight plots
+#' @param column2highlight factor or logical column to highlight plots
 #'
 #' @return exploratory plots from ggpairs
 #' @export
@@ -389,7 +389,7 @@ ggpairs_proteomics <- function(log2, datamined, column2highlight) {
 
 #' create a dotplot colored by Zscore and sized by the percent of abundance
 #'
-#' @param logistictable a dataframe with mined data contained as logistic variables; with protein/gene name as "name"
+#' @param logicaltable a dataframe with mined data contained as logical variables; with protein/gene name as "name"
 #' @param log2 a dataframe with protein abundances; with protein/gene name as "name"
 #' @param saveplot if True, the plot will be saved
 #' @param namefile the name of the plot to save if saveplot=True
@@ -400,13 +400,13 @@ ggpairs_proteomics <- function(log2, datamined, column2highlight) {
 #' @return dotplot; saved or not
 #' @export
 #'
-#' @examples dotplot_by_methods(logistic_mined_data, log2)
-dotplot_by_methods <- function(logistictable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
+#' @examples dotplot_by_methods(logical_mined_data, log2)
+dotplot_by_methods <- function(logicaltable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
   table <- melt(mean_function(log2))
   table$Zscore <- ave(table$value, table$variable, FUN = function(x) ((x-mean(x))/sd(x)))
   table$percent <- ave(table$value, table$variable, FUN = function(x) ((x - min(x)) / (max(x) - min(x))) * 100)
-  logistic2plot <- melt(logistictable, "name")
-  tableforplot <- merge(logistic2plot, table, by="name")
+  logical2plot <- melt(logicaltable, "name")
+  tableforplot <- merge(logical2plot, table, by="name")
   tableforplot <- tableforplot[tableforplot$value.x==TRUE,]
   tableforplot <- subset(tableforplot, select = -value.y)
   table2plot <- unique(within(tableforplot, {
@@ -447,11 +447,9 @@ compute_ttest <- function(df, padj="fdr") {
   compare_one_method <- function(method) {
     pergene <- function(gene) {
       df <- df[df$name == gene,]
-      current_method_data <- df[df$Method == method, ]
-      other_methods_data <- df[df$Method != method, ]
-      other_means <- aggregate(value ~ name, other_methods_data, mean)
-      comparison_data <- merge(current_method_data, other_means, by="name", suffixes = c("_current", "_other_mean"))
-      t_tests <- melt(stats::t.test(comparison_data$value_current, comparison_data$value_other_mean)$p.value)
+      current_method_data <- df[df$Method == method,]
+      other_methods_data <- df[df$Method != method,]
+      t_tests <- t.test(current_method_data$value, other_methods_data$value)$p.value
       p_adjusted <- p.adjust(t_tests, method = padj)
       return(p_adjusted)
     }
@@ -474,7 +472,7 @@ compute_ttest <- function(df, padj="fdr") {
 #' @export
 #'
 #' @examples mean_diff_methods(log2)
-mean_diff_methods <- function(df, padj="fdr") {
+mean_diff_methods <- function(df) {
   df <- replicates_factor(df)
   vectormethod <- sort(unique(df$Method))
   vectorgene <- unique(df$name)
@@ -483,10 +481,8 @@ mean_diff_methods <- function(df, padj="fdr") {
       df_subset <- df[df$name == gene,]
       current_method_data <- df_subset[df_subset$Method == method, ]
       other_methods_data <- df_subset[df_subset$Method != method, ]
-      other_means <- aggregate(value ~ name, other_methods_data, mean)
-      comparison_data <- merge(current_method_data, other_means, by="name", suffixes = c("_current", "_other_mean"))
-      mean_difference <- mean(comparison_data$value_current) - mean(comparison_data$value_other_mean)
-      return(data.frame(mean_difference))
+      mean_difference <- mean(current_method_data$value) - mean(other_methods_data$value)
+      return(mean_difference)
     }
     results <- Reduce(rbind, Map(pergene, vectorgene))
     names(results) <- c("mean_difference")
@@ -503,7 +499,7 @@ mean_diff_methods <- function(df, padj="fdr") {
 #'
 #' @param tablettest output of compute_ttest()
 #' @param tablemean output of mean_diff_methods()
-#' @param minedproperties logistic table of mined properties
+#' @param minedproperties logical table of mined properties
 #' @param saveplot True/False to save the plot in the desired path
 #' @param namefile name of the output file if saved
 #' @param path path of the output file if saved
@@ -552,7 +548,7 @@ meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FAL
 
 #' Create a simple dotplot around the max and min values per method
 #'
-#' @param logistictable logistic table of the mined properties
+#' @param logicaltable logical table of the mined properties
 #' @param log2 log2 protein abundances matrix
 #' @param mean_computing True/False; if True, you will get average values to get one color for the dot. If False, applies a gradient within each dot based on values.
 #' @param saveplot True/False to save the plot in the desired path
@@ -568,12 +564,12 @@ meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FAL
 #' @importFrom dplyr summarise group_by
 #'
 #' @examples dotratio(subcell, log2)
-dotratio <- function(logistictable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
+dotratio <- function(logicaltable, log2, mean_computing=TRUE, saveplot=FALSE, namefile="DotPlot.png", path="", width = 25, height = 6) {
   table <- replicates_factor(log2)
   table$ratio <- ave(table$value, table$Method, FUN = function(x) ((x - min(x)) / (max(x) - min(x))) * 100)
-  logistic2plot <- reshape2::melt(logistictable, "name")
-  colnames(logistic2plot) <- c("name", "annotations", "logical")
-  tableforplot <- merge(logistic2plot, table, by="name")
+  logical2plot <- reshape2::melt(logicaltable, "name")
+  colnames(logical2plot) <- c("name", "annotations", "logical")
+  tableforplot <- merge(logical2plot, table, by="name")
   tableforplot <- tableforplot[tableforplot$logical == TRUE,]
   range_values <- dplyr::summarise(
     dplyr::group_by(tableforplot, annotations),

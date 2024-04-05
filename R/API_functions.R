@@ -331,11 +331,11 @@ datamining_assembling <- function(df, colname, fun) {
 #' @return df containing the new column
 #' @export
 #' @import pbapply
-#' @examples datamining_annotationsnumber(head(datamined), "catalytic_activity", get_nextprot_annotationsnumber, "catalytic-activity")
-datamining_annotationsnumber <- function(df, fun, annotation) {
+#' @examples datamining_annotationsnumber(head(datamined), "catalytic_activity")
+datamining_annotationsnumber <- function(df, annotation) {
   # first please choose a dataframe containing "UniProtID" as colname
   data2assemble <- df
-  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) fun(prot, annotation)))
+  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) get_nextprot_annotationsnumber(prot, annotation)))
   names(data2assemble)[names(data2assemble) == "column"] <- sub("^([a-z])", "\\U\\1", gsub("-", "_", annotation), perl = TRUE)
   return(na.omit(data2assemble))
 }

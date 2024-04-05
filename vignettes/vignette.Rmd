@@ -276,7 +276,7 @@ datamining_assembling(head(subset(datamined, select = c(1:2))), "Subcell", get_n
 For the general one, there is a supplementary parameter, so you can use this function:
 
 ```{r}
-datamining_annotationsnumber(head(subset(datamined, select = c(1:2))), get_nextprot_annotationsnumber, "catalytic-activity")
+datamining_annotationsnumber(head(subset(datamined, select = c(1:2))), "catalytic-activity")
 ```
 
 As you can see, if you mine subcellular location and glycosylation site you will get strings columns. You can use the function below to transform this column into a new table:
@@ -289,12 +289,12 @@ On the other hand, some columns will be number and won't be easy to be analyzed,
 
 ```{r}
 datatable(column_maker(subset(datamined, select=c(name, UniProtID, Mass)), "Mass", "BinaryMass"), options = list(scrollX = TRUE, scrollY = "400px"))
-#> to transform this to a logistic variable, you can run datamined$MassHigherThanAverage <- as.logical(ifelse(datamined$BinaryMass=="High", TRUE, FALSE))
+#> to transform this to a logical variable, you can run datamined$MassHigherThanAverage <- as.logical(ifelse(datamined$BinaryMass=="High", TRUE, FALSE))
 ```
 
 ```{r}
 datatable(column_maker(subset(datamined, select=c(name, UniProtID, IP)), "IP", "IPbinary"), options = list(scrollX = TRUE, scrollY = "400px"))
-#> to transform this to a logistic variable, you can run datamined$IPHigherThanAverage <- as.logical(ifelse(datamined$IPbinary=="High", TRUE, FALSE))
+#> to transform this to a logical variable, you can run datamined$IPHigherThanAverage <- as.logical(ifelse(datamined$IPbinary=="High", TRUE, FALSE))
 ```
 
 ```{r}

@@ -4,7 +4,7 @@
 \alias{mean_diff_methods}
 \title{Compare the mean of one method against all others per protein}
 \usage{
-mean_diff_methods(df, padj = "fdr")
+mean_diff_methods(df)
 }
 \arguments{
 \item{df}{log2 protein abundance matrix}

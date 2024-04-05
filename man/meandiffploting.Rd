@@ -20,7 +20,7 @@ meandiffploting(
 
 \item{tablemean}{output of mean_diff_methods()}
 
-\item{minedproperties}{logistic table of mined properties}
+\item{minedproperties}{logical table of mined properties}
 
 \item{saveplot}{True/False to save the plot in the desired path}
 

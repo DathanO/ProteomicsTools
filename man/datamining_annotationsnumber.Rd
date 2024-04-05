@@ -4,16 +4,16 @@
 \alias{datamining_annotationsnumber}
 \title{Incorporate a new column from the datamining function "get_nextprot_annotationsnumber")}
 \usage{
-datamining_annotationsnumber(df, fun, annotation)
+datamining_annotationsnumber(df, annotation)
 }
 \arguments{
 \item{df}{containing "UniProtID" as colname}
 
-\item{fun}{name of the function to use}
-
 \item{annotation}{name of the annotation parameter of the function to use}
 
 \item{colname}{in strings of the datamined column}
+
+\item{fun}{name of the function to use}
 }
 \value{
 df containing the new column
@@ -22,5 +22,5 @@ df containing the new column
 Incorporate a new column from the datamining function "get_nextprot_annotationsnumber")
 }
 \examples{
-datamining_annotationsnumber(head(datamined), "catalytic_activity", get_nextprot_annotationsnumber, "catalytic-activity")
+datamining_annotationsnumber(head(datamined), "catalytic_activity")
 }
