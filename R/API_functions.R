@@ -193,7 +193,7 @@ uniprot_assembling <- function(df) {
 
 #' Incorporate a new column from the datamining functions above
 #'
-#' @param df containing "UniProtID" as colname
+#' @param df containing "name" as colname
 #' @param colname in strings of the datamined column
 #' @param fun name of the function to use
 #'
@@ -202,16 +202,15 @@ uniprot_assembling <- function(df) {
 #' @import pbapply
 #' @examples datamining_assembling(head(datamined), "PI", get_nextprot_PI)
 datamining_assembling <- function(df, colname, fun) {
-  # first please choose a dataframe containing "UniProtID" as colname
   data2assemble <- df
-  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) fun(prot)))
+  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$name, function(prot) fun(prot)))
   names(data2assemble)[names(data2assemble) == "column"] <- colname
   return(na.omit(data2assemble))
 }
 
 #' Incorporate a new column from the datamining function "get_nextprot_annotationsnumber")
 #'
-#' @param df containing "UniProtID" as colname
+#' @param df containing "name" as colname
 #' @param colname in strings of the datamined column
 #' @param fun name of the function to use
 #' @param annotation name of the annotation parameter of the function to use
@@ -221,9 +220,8 @@ datamining_assembling <- function(df, colname, fun) {
 #' @import pbapply
 #' @examples datamining_annotationsnumber(head(datamined), "catalytic_activity")
 datamining_annotationsnumber <- function(df, annotation) {
-  # first please choose a dataframe containing "UniProtID" as colname
   data2assemble <- df
-  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$UniProtID, function(prot) get_nextprot_annotationsnumber(prot, annotation)))
+  data2assemble$column <- unlist(pbapply::pblapply(data2assemble$name, function(prot) get_nextprot_annotationsnumber(prot, annotation)))
   names(data2assemble)[names(data2assemble) == "column"] <- sub("^([a-z])", "\\U\\1", gsub("-", "_", annotation), perl = TRUE)
   return(na.omit(data2assemble))
 }
@@ -333,7 +331,7 @@ combineMembraneColumns <- function(df) {
   for(col in membrane_cols) {
     df$Membrane <- df$Membrane | df[[col]]
   }
-  membrane_cols <- setdiff(membrane_cols, "Membrane")
+  membrane_cols <- dplyr::setdiff(membrane_cols, "Membrane")
   df <- df[, !(names(df) %in% membrane_cols)]
   return(df)
 }
