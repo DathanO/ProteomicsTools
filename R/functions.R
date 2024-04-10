@@ -447,9 +447,7 @@ compute_ttest <- function(df, padj="fdr") {
   compare_one_method <- function(method) {
     pergene <- function(gene) {
       df <- df[df$name == gene,]
-      current_method_data <- df[df$Method == method,]
-      other_methods_data <- df[df$Method != method,]
-      t_tests <- t.test(current_method_data$value, other_methods_data$value)$p.value
+      t_tests <- t.test(data=df, value ~ Method == method)$p.value
       p_adjusted <- p.adjust(t_tests, method = padj)
       return(p_adjusted)
     }
@@ -516,27 +514,27 @@ meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FAL
   tablemean$name <- rownames(tablemean)
   tablettest <- reshape2::melt(tablettest, id.vars = "name")
   tablemean <- reshape2::melt(tablemean, id.vars = "name")
-  minedproperties <- reshape2::melt(minedproperties, id.vars = "name")
+  minedproperties <- reshape2::melt(minedproperties[,sort(names(minedproperties))], id.vars = "name")
   firstmerge <- merge(tablettest, tablemean, by = c("name", "variable"))
   table2plot <- merge(firstmerge, minedproperties, by = "name")
   table2plot <- table2plot[table2plot$value==TRUE,]
-  table2plot <- table2plot[table2plot$value.x < 0.05,]
   table2plot <- within(table2plot, {
     P.Value <- ave(value.x, variable.x, variable.y)
     MeanDiff <- ave(value.y, variable.x, variable.y)
     MeanDiffBinary <- as.factor(ifelse(MeanDiff<0, "Down", "Up"))
   })
+  table2plot <- table2plot[table2plot$P.Value< 0.05,]
   plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y)) +
-    ggplot2::geom_point(aes(col=P.Value, size=MeanDiff, shape=MeanDiffBinary, fill=P.Value)) +
+    ggplot2::geom_point(ggplot2::aes(col=P.Value, size=abs(MeanDiff), shape=MeanDiffBinary, fill=P.Value)) +
     ggplot2::scale_color_gradient(name="Adjusted P-Value", low="red", high="yellow") +
     ggplot2::scale_fill_gradient(low="red", high="yellow") +
-    ggplot2::scale_size(name="Mean Differences\n(Average)") +
+    ggplot2::scale_size(name="Mean Differences\n(Absolute Value)") +
     ggplot2::scale_shape_manual(name="Mean Differences\nabove or below 0", values=c("Up"=24, "Down"=25)) +
     ggplot2::theme_classic() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
     ggplot2::xlab("Variables") +
     ggplot2::ylab("Methods") +
-    ggplot2::guides(fill=guide_none()) +
+    ggplot2::guides(fill=ggplot2::guide_none()) +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
                    panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
   plot

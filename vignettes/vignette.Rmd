@@ -252,12 +252,8 @@ You can use the package in order to mine IP, Mass, TMregions, glycosylation site
 ```{r}
 get_nextprot_PI("P01023")
 get_nextprot_mass("P01023")
-get_nextprot_transmembrane("P01023")
 get_nextprot_glycosite("P01023")
 get_nextprot_subcell("P01023")
-get_nextprot_coiledcoil("P01023")
-get_nextprot_lipidationsite("P01023")
-get_nextprot_zincfinger("P01023")
 ```
 
 If the annotation you want is not present there, you can use the general function that count the number of the annotation of interest:

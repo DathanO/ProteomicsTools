@@ -72,35 +72,6 @@ get_nextprot_mass <- function(protname) {
   } else {return(NA)}
 }
 
-#' get number of TM domains
-#'
-#' @param protein name
-#'
-#' @return number of TM domains
-#' @export
-#' @import httr
-#' @importFrom jsonlite fromJSON
-#' @examples get_nextprot_transmembrane("Q9NRK6")
-get_nextprot_transmembrane <- function(protname) {
-  # Nextprot API endpoint and ProteinID
-  api_endpoint <- "https://api.nextprot.org/entry/"
-  api_end <- "/transmembrane-region.json"
-  protein_id <- paste0("NX_", protname)
-  # Send the API request and retrieve the JSON data
-  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
-  if (response$status_code == 200) {
-    json_data <- httr::content(response, as = "text")
-    # Parse JSON data into an R object
-    parsed_data <- (jsonlite::fromJSON(json_data))
-    data2mine <- parsed_data$entry$annotationsByCategory$`transmembrane-region`
-    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
-    if (is.null(data2mine)) {
-      print(0)
-      return(0)
-    } else {return(nrow(data2mine))}
-  } else {return(NA)}
-}
-
 
 #' Get subcellular locations
 #'
@@ -177,89 +148,6 @@ get_nextprot_glycosite <- function(protname) {
   } else {return(NA)}
 }
 
-#' Get number of coiled-coil of the protein
-#'
-#' @param protname UniProtID
-#'
-#' @return number of coiled-coil
-#' @export
-#'
-#' @examples get_nextprot_coiledcoil("Q99996")
-get_nextprot_coiledcoil <- function(protname) {
-  # Nextprot API endpoint and ProteinID
-  api_endpoint <- "https://api.nextprot.org/entry/"
-  api_end <- "/coiled-coil-region.json"
-  protein_id <- paste0("NX_", protname)
-  # Send the API request and retrieve the JSON data
-  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
-  if (response$status_code == 200) {
-    json_data <- httr::content(response, as = "text")
-    # Parse JSON data into an R object
-    parsed_data <- (jsonlite::fromJSON(json_data))
-    data2mine <- parsed_data$entry$annotationsByCategory$`coiled-coil`
-    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
-    if (is.null(data2mine)) {
-      return(0)
-    } else return(nrow(data2mine))
-    #return(result)
-  } else {return(NA)}
-}
-
-#' Title Get number of lipidation site of the protein
-#'
-#' @param protname UniProtID
-#'
-#' @return number of lipidation site
-#' @export
-#'
-#' @examples get_nextprot_lipidationsite("Q14254")
-get_nextprot_lipidationsite <- function(protname) {
-  # Nextprot API endpoint and ProteinID
-  api_endpoint <- "https://api.nextprot.org/entry/"
-  api_end <- "/lipidation-site.json"
-  protein_id <- paste0("NX_", protname)
-  # Send the API request and retrieve the JSON data
-  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
-  if (response$status_code == 200) {
-    json_data <- httr::content(response, as = "text")
-    # Parse JSON data into an R object
-    parsed_data <- (jsonlite::fromJSON(json_data))
-    data2mine <- parsed_data$entry$annotationsByCategory$`lipidation-site`
-    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
-    if (is.null(data2mine)) {
-      return(0)
-    } else {return(nrow(data2mine))}
-    #return(result)
-  } else {return(NA)}
-}
-
-#' Title Get number of Zinc-Finger region of the protein
-#'
-#' @param protname UniProtID
-#'
-#' @return number of zinc-finger region
-#' @export
-#'
-#' @examples get_nextprot_zincfinger("O14686")
-get_nextprot_zincfinger <- function(protname) {
-  # Nextprot API endpoint and ProteinID
-  api_endpoint <- "https://api.nextprot.org/entry/"
-  api_end <- "/zinc-finger-region.json"
-  protein_id <- paste0("NX_", protname)
-  # Send the API request and retrieve the JSON data
-  response <- httr::GET(paste0(api_endpoint, protein_id, api_end))
-  if (response$status_code == 200) {
-    json_data <- httr::content(response, as = "text")
-    # Parse JSON data into an R object
-    parsed_data <- (jsonlite::fromJSON(json_data))
-    data2mine <- parsed_data$entry$annotationsByCategory$`zinc-finger-region`
-    data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
-    if (is.null(data2mine)) {
-      return(0)
-    } else {return(nrow(data2mine))}
-  } else {return(NA)}
-}
-
 #' Title General function to mine integer annotations (number of TM domains, catalytic activity...)
 #'
 #' @param protname UniProtID
@@ -283,8 +171,8 @@ get_nextprot_annotationsnumber <- function(protname, name_of_annotation) {
     data2mine <- parsed_data$entry$annotationsByCategory[[name_of_annotation]]
     data2mine <- data2mine[data2mine$qualityQualifier == "GOLD",]
     if (is.null(data2mine)) {
-      return(0)
-    } else {return(nrow(data2mine))}
+      return(as.integer(0))
+    } else {return(as.integer(nrow(data2mine)))}
   } else {return(NA)}
 }
 
@@ -440,22 +328,12 @@ extract_glyco_string <- function(table, colname) {
 #'
 #' @examples combineMembraneColumns(subcell)
 combineMembraneColumns <- function(df) {
-  # Ensure there's a "Membrane" column, initialize as FALSE if it doesn't exist
-  if (!"Membrane" %in% names(df)) {
-    df$Membrane <- FALSE
-  }
-
-  # Identify all columns that contain the word "membrane", excluding the exact "Membrane"
   membrane_cols <- grep("membrane", names(df), ignore.case = TRUE, value = TRUE)
   membrane_cols <- membrane_cols[membrane_cols != "Membrane"]
-
-  # Combine all "membrane" related columns into the "Membrane" column
   for(col in membrane_cols) {
     df$Membrane <- df$Membrane | df[[col]]
   }
-
-  # Drop the original "membrane" columns, keeping the updated "Membrane"
+  membrane_cols <- setdiff(membrane_cols, "Membrane")
   df <- df[, !(names(df) %in% membrane_cols)]
-
   return(df)
 }
