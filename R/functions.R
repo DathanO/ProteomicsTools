@@ -136,6 +136,8 @@ reformat_table <- function(df, padj="fdr", treshold=0.05) {
 #' fishertest(reformat_table(datamined), reformat_table(ttest), "fdr")
 fishertest <- function(df_mined, ttest_logical, padj = "none") {
   results <- data.frame(Table = character(), False_False = integer(), False_True = integer(), True_False = integer(), True_True = integer(), p_val_fisher = numeric(), p_adj = numeric(), stringsAsFactors = FALSE)
+  diff <- setdiff(ttest_logical$name, df_mined$name)
+  for (na in diff) {ttest_logical <- ttest_logical[ttest_logical$name!=na,]}
   for (ncol in (1:length(df_mined))) {
     if (is.logical(df_mined[,ncol]) == TRUE) {
       for (colsign in 1:length(ttest_logical)) {
@@ -457,6 +459,7 @@ compute_ttest <- function(df, padj="fdr") {
   results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
   rownames(results_df) <- vectorgene
   colnames(results_df) <- vectormethod
+  results_df$name <- vectorgene
   return(results_df)
 }
 
@@ -489,6 +492,7 @@ mean_diff_methods <- function(df) {
   results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
   rownames(results_df) <- vectorgene
   colnames(results_df) <- vectormethod
+  results_df$name <- vectorgene
   return(results_df)
 }
 
@@ -509,7 +513,7 @@ mean_diff_methods <- function(df) {
 #' @import ggplot2
 #' @import reshape2
 #' @examples meandifftesting(meantt, meandiff, glycolink)
-meandiffploting <- function(tablettest, tablemean, minedproperties, saveplot=FALSE, namefile="MeanDifferenceDotPlot", path="", width=10, height=10) {
+dotplot_meandiff <- function(tablettest, tablemean, minedproperties, saveplot=FALSE, namefile="MeanDifferenceDotPlot", path="", width=10, height=10) {
   tablettest$name <- rownames(tablettest)
   tablemean$name <- rownames(tablemean)
   tablettest <- reshape2::melt(tablettest, id.vars = "name")
