@@ -7,7 +7,7 @@
 datamining_annotationsnumber(df, annotation)
 }
 \arguments{
-\item{df}{containing "UniProtID" as colname}
+\item{df}{containing "name" as colname}
 
 \item{annotation}{name of the annotation parameter of the function to use}
 

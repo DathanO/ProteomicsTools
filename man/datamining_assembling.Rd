@@ -7,7 +7,7 @@
 datamining_assembling(df, colname, fun)
 }
 \arguments{
-\item{df}{containing "UniProtID" as colname}
+\item{df}{containing "name" as colname}
 
 \item{colname}{in strings of the datamined column}
 
