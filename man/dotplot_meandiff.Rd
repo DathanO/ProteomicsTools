@@ -39,5 +39,5 @@ plot
 Create a Plot of the difference of the means after using T-Test and MeanDiff
 }
 \examples{
-meandifftesting(meantt, meandiff, glycolink)
+dotplot_meandiff(meantt, meandiff, glycolink)
 }

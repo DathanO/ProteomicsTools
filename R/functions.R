@@ -459,7 +459,6 @@ compute_ttest <- function(df, padj="fdr") {
   results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
   rownames(results_df) <- vectorgene
   colnames(results_df) <- vectormethod
-  results_df$name <- vectorgene
   return(results_df)
 }
 
@@ -472,8 +471,8 @@ compute_ttest <- function(df, padj="fdr") {
 #' @return mean differences matrix
 #' @export
 #'
-#' @examples mean_diff_methods(log2)
-mean_diff_methods <- function(df) {
+#' @examples compute_meandiff_methods(log2)
+compute_meandiff_methods <- function(df) {
   df <- replicates_factor(df)
   vectormethod <- sort(unique(df$Method))
   vectorgene <- unique(df$name)
@@ -492,7 +491,6 @@ mean_diff_methods <- function(df) {
   results_df <- data.frame(Reduce(cbind, Map(compare_one_method, vectormethod)))
   rownames(results_df) <- vectorgene
   colnames(results_df) <- vectormethod
-  results_df$name <- vectorgene
   return(results_df)
 }
 
@@ -512,7 +510,7 @@ mean_diff_methods <- function(df) {
 #' @export
 #' @import ggplot2
 #' @import reshape2
-#' @examples meandifftesting(meantt, meandiff, glycolink)
+#' @examples dotplot_meandiff(meantt, meandiff, glycolink)
 dotplot_meandiff <- function(tablettest, tablemean, minedproperties, saveplot=FALSE, namefile="MeanDifferenceDotPlot", path="", width=10, height=10) {
   tablettest$name <- rownames(tablettest)
   tablemean$name <- rownames(tablemean)
