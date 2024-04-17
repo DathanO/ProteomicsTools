@@ -192,8 +192,9 @@ mean_function <- function(df) {
 #' @export
 #'
 #' @examples data("log2")
-#' myfoldchange(mean_function(log2))
-myfoldchange <- function(meandflog2) {
+#' myfoldchange(log2)
+myfoldchange <- function(log2) {
+  meandflog2 <- mean_function(log2)
   log2fc <- function(x,y) {
     log2(x/y)
   }
