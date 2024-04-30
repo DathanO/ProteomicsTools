@@ -511,8 +511,8 @@ compute_meandiff_methods <- function(df) {
 #' @export
 #' @import ggplot2
 #' @import reshape2
-#' @examples dotplot_meandiff(meantt, meandiff, glycolink)
-dotplot_meandiff <- function(tablettest, tablemean, minedproperties, saveplot=FALSE, namefile="MeanDifferenceDotPlot", path="", width=10, height=10) {
+#' @examples dotplot_meandiff(meantt, meandiff, glycolink, treshold=0.0001)
+dotplot_meandiff <- function(tablettest, tablemean, minedproperties, treshold=0.05, savetable=TRUE, nametable="SignificativeProteins.csv", saveplot=FALSE, nameplot="MeanDifferenceDotPlot.png", path="", width=10, height=10) {
   tablettest$name <- rownames(tablettest)
   tablemean$name <- rownames(tablemean)
   tablettest <- reshape2::melt(tablettest, id.vars = "name")
@@ -521,24 +521,24 @@ dotplot_meandiff <- function(tablettest, tablemean, minedproperties, saveplot=FA
   firstmerge <- merge(tablettest, tablemean, by = c("name", "variable"))
   table2plot <- merge(firstmerge, minedproperties, by = "name")
   table2plot <- table2plot[table2plot$value==TRUE,]
+  table2plot <- table2plot[table2plot$value.x < treshold,]
   table2plot <- within(table2plot, {
-    P.Value <- ave(value.x, variable.x, variable.y)
     MeanDiff <- ave(value.y, variable.x, variable.y)
     MeanDiffBinary <- as.factor(ifelse(MeanDiff<0, "Down", "Up"))
   })
-  table2plot <- table2plot[table2plot$P.Value< 0.05,]
+  if (savetable) {write.csv(table2plot, file=nametable, row.names = FALSE)}
   plot <- ggplot2::ggplot(table2plot, ggplot2::aes(x=variable.x, y=variable.y)) +
-    ggplot2::geom_point(ggplot2::aes(col=P.Value, size=abs(MeanDiff), shape=MeanDiffBinary, fill=P.Value)) +
-    ggplot2::scale_color_gradient(name="Adjusted P-Value", low="red", high="yellow") +
-    ggplot2::scale_fill_gradient(low="red", high="yellow") +
+    ggplot2::geom_point(ggplot2::aes(size=abs(MeanDiff), shape=MeanDiffBinary, fill=value.x), stroke=0.5) +
+    ggplot2::scale_fill_continuous(name="Adjusted P-Value", low="red", high="yellow") +
     ggplot2::scale_size(name="Mean Differences\n(Absolute Value)") +
     ggplot2::scale_shape_manual(name="Mean Differences\nabove or below 0", values=c("Up"=24, "Down"=25)) +
     ggplot2::theme_classic() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle=45, vjust=1, hjust = 1)) +
     ggplot2::xlab("Variables") +
     ggplot2::ylab("Methods") +
-    ggplot2::guides(fill=ggplot2::guide_none()) +
+    ggplot2::guides(shape=ggplot2::guide_legend(override.aes=list(size=3, stroke=1.5))) +
     ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#BFD5E3", colour = "#6D9EC1"),
+                   legend.text = ggplot2::element_text(size=12),
                    panel.grid.major = ggplot2::element_line(linewidth = 0.15, linetype = 'solid', colour = 'white'))
   plot
   if (saveplot) {
