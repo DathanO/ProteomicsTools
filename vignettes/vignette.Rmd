@@ -62,9 +62,18 @@ install.packages("stats")
 ```
 
 ### Installation of the package.tar.gz
+
 ```{r, eval=FALSE}
 install.packages("~/path/ProteomicsTools_version.tar.gz", repos = NULL, type = "source")
 ```
+
+### Installation from RPackage project
+
+To install the package on any OS, you should be able to clone the ZIP from github (https://github.com/DathanO/ProteomicsTools/); then open a new project in RStudio, and find & click the "ProteomicsTools.Rproj" file. 
+
+Once opened, you can try installing it by going to the right-up window "Build", "More", and "Clean & Install". 
+
+If some dependencies are not installed, you'll get a "status 1" message error saying to install the required packages. Otherwise, it is supposed to work. Feel free to reach me if it isn't working this way.
 
 ## Presentation of the package {.flexbox .vcenter}
 
@@ -90,16 +99,16 @@ To use the package, your table must be in a certain format (MaxQuant):
 - Values should be Log2 of the Protein abundance
 - Log2 tables should be filtered to get only an identifier and the protein abundance:
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=TRUE, eval=TRUE}
 # example table
 datatable(log2[,-1], options = list(scrollX = TRUE, scrollY = "400px"))
 ```
 
 ---
 
-### You can use mined data, and use the package to mine data:
+### You can use mined data, or use the package to mine data:
 
-```{r, echo=TRUE, eval=FALSE}
+```{r, echo=TRUE, eval=TRUE}
 datatable(tail(datamined), options = list(scrollX = TRUE, scrollY = "400px"))
 ```
 

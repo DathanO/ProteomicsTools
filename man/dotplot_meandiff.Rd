@@ -8,8 +8,11 @@ dotplot_meandiff(
   tablettest,
   tablemean,
   minedproperties,
+  treshold = 0.05,
+  savetable = TRUE,
+  nametable = "SignificativeProteins.csv",
   saveplot = FALSE,
-  namefile = "MeanDifferenceDotPlot",
+  nameplot = "MeanDifferenceDotPlot.png",
   path = "",
   width = 10,
   height = 10
@@ -24,13 +27,13 @@ dotplot_meandiff(
 
 \item{saveplot}{True/False to save the plot in the desired path}
 
-\item{namefile}{name of the output file if saved}
-
 \item{path}{path of the output file if saved}
 
 \item{width}{width of the output file if saved}
 
 \item{height}{height of the output file if saved}
+
+\item{namefile}{name of the output file if saved}
 }
 \value{
 plot
@@ -39,5 +42,5 @@ plot
 Create a Plot of the difference of the means after using T-Test and MeanDiff
 }
 \examples{
-dotplot_meandiff(meantt, meandiff, glycolink)
+dotplot_meandiff(meantt, meandiff, glycolink, treshold=0.0001)
 }
