@@ -1,7 +1,7 @@
 Package: ProteomicsTools
 Type: Package
 Title: Analysis Tools for Proteomics Experiments
-Version: 0.9.5
+Version: 0.9.6
 Author: David Nathan Ohayon
 Maintainer: The package maintainer <david.ohayon@etu.unige.ch>
 Description: Functions to analyze Log2 Protein Abundances
@@ -19,7 +19,7 @@ Description: Functions to analyze Log2 Protein Abundances
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Depends:
   BiocManager (>= 0.46.0),
   ggplot2 (>= 3.4.2),

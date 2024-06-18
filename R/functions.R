@@ -212,6 +212,35 @@ myfoldchange <- function(log2) {
   data
 }
 
+#' Compute fold-change for each method vs all other methods
+#'
+#' @param log2 protein abundance table (log2 normalized)
+#'
+#' @return foldchange matrix for each method
+#' @export
+#'
+#' @examples myfoldchange_unpaired(log2)
+myfoldchange_unpaired <- function(log2) {
+  meandflog2 <- mean_function(log2)
+  meandf <- reshape2::melt(meandflog2, id.vars = "name")
+  fold_changes_list <- list(ID = meandf$name[meandf$variable == unique(meandf$variable)[1]])
+  methods <- unique(meandf$variable)
+  for (method in methods) {
+    current_method_data <- meandf[meandf$variable == method,]
+    other_methods_data <- meandf[meandf$variable != method,]
+    other_means <- aggregate(value ~ name, data = other_methods_data, mean)
+    merged_data <- merge(current_method_data, other_means, by = "name")
+    log2fc <- function(x, y) log2(x / y)
+    fold_changes_list[[method]] <- sapply(seq_along(merged_data$value.x),
+                                          function(i) log2fc(merged_data$value.x[i], merged_data$value.y[i]))
+  }
+  fold_changes_df <- data.frame(fold_changes_list)
+  rownames(fold_changes_df) <- fold_changes_df$ID
+  colnames(fold_changes_df) <- colnames(meandflog2)
+  fold_changes_df <- fold_changes_df[,-1]
+  return(fold_changes_df)
+}
+
 #' Automatize VolcanoPlots of your dataset
 #'
 #' @param ttest A data.frame of p.values (Output of mypairwise_t())
@@ -241,6 +270,7 @@ volcano_maker <- function(ttest, foldc, datamined, binarycol, threshold=5, namef
         table2plot <- data.frame(table2plot)
         rownames(table2plot) <- rownames(ttest)
         colnames(table2plot) <- c("log10pval", "log2foldchange", binarycol)
+        table2plot[,binarycol] <- as.factor(datamined[,binarycol])
         plot <- ggplot2::ggplot(data=table2plot, ggplot2::aes(x=log2foldchange, y=-log10(log10pval), color=!!rlang::sym(binarycol))) +
           ggplot2::geom_point() + ggplot2::ylab("-log10pval") +
           ggplot2::geom_vline(xintercept=c(-0.1, 0.1), col="black") +
@@ -610,4 +640,75 @@ dotratio <- function(logicaltable, log2, mean_computing=TRUE, saveplot=FALSE, na
     ggplot2::ggsave(filename, plot = plot, width = width, height = height, limitsize = FALSE)
   }
   return(plot)
+}
+
+
+#' Compute anova analysis for each protein to compare each method altogether
+#'
+#' @param log2 protein abundance matrix (log2 normalized)
+#'
+#' @return anova output matrix
+#' @export
+#'
+#' @examples anova_analysis(log2)
+anova_analysis <- function(log2) {
+  long <- replicates_factor(log2)
+  proteins <- unique(long$name)
+  output <- data.frame()
+  for (protein in proteins) {
+    df <- long[long$name == protein,]
+    model <- aov(value ~ Method + Replicates, data = df)
+    anova_table <- summary(model)
+    output[protein, "Sum_of_Squares"] <- anova_table[[1]]["Method", "Sum Sq"]
+    output[protein, "Mean_Squares"] <- anova_table[[1]]["Method", "Mean Sq"]
+    output[protein, "Fvalue"] <- anova_table[[1]]["Method", "F value"]
+    output[protein, "Pvalue"] <- anova_table[[1]]["Method", "Pr(>F)"]
+  }
+  return(output)
+}
+
+#' Compute linear models for each protein to compare each method
+#'
+#' @param log2 protein abundance table
+#' @return a matrix summarizing results of lm
+#' @export
+#'
+#' @importFrom dplyr select
+#' @importFrom tidyr pivot_wider
+#'
+#' @examples lm_analysis(log2)
+lm_analysis <- function(log2) {
+  long <- replicates_factor(log2)
+  proteins <- unique(long$name)
+  results_list <- list()
+  for (protein in proteins) {
+    df <- long[long$name == protein,]
+    model <- lm(value ~ Method + Replicates, data = df)
+    output_table <- summary(model)
+    method_coefficients <- output_table$coefficients[grep("Method", rownames(output_table$coefficients)), ]
+    method_details <- data.frame(
+      Method = rownames(method_coefficients),
+      Estimate = method_coefficients[, "Estimate"],
+      PValue = method_coefficients[, "Pr(>|t|)"]
+    )
+    protein_summary <- data.frame(
+      name = protein,
+      ResidualStandardError = output_table$sigma,
+      RSquared = output_table$r.squared,
+      AdjustedRSquared = output_table$adj.r.squared,
+      FStatistic = output_table$fstatistic[1],
+      FPValue = pf(output_table$fstatistic[1], output_table$fstatistic[2], output_table$fstatistic[3], lower.tail = FALSE)
+    )
+    combined_details <- cbind(protein_summary, method_details)
+    results_list[[protein]] <- combined_details
+  }
+  output <- do.call(rbind, results_list)
+  output_wide <- output %>%
+    tidyr::pivot_wider(
+      names_from = Method,
+      values_from = c(Estimate, PValue),
+      names_glue = "{Method}_{.value}"
+    ) %>%
+    dplyr::select(name, starts_with("Method"), everything())
+  return(output_wide)
 }
