@@ -6,8 +6,7 @@
 #' @export
 #' @import edgeR
 #' @import limma
-#' @examples data("log2")
-#' myMDSplot(log2)
+#' @examples myMDSplot(log2)
 myMDSplot <- function(log2, rows = TRUE) {
   if (rows) {
     rownames(log2) <- log2$name
@@ -29,7 +28,7 @@ myMDSplot <- function(log2, rows = TRUE) {
 #' @import stats
 #'
 #' @examples data("log2")
-#' mypairwise_t(log2)
+#' mypairwise_t(head(log2))
 mypairwise_t <- function(df, padj="fdr") {
   df <- replicates_factor(df)
   method <- sort(unique(df$Method))
@@ -169,7 +168,7 @@ fishertest <- function(df_mined, ttest_logical, padj = "none") {
 #' @export
 #'
 #' @examples data("log2")
-#' mean_function(log2)
+#' mean_function(head(log2))
 mean_function <- function(df) {
   dfrep <- replicates_factor(df)
   df$order <- seq_len(nrow(df))
@@ -192,7 +191,7 @@ mean_function <- function(df) {
 #' @export
 #'
 #' @examples data("log2")
-#' myfoldchange(log2)
+#' myfoldchange(head(log2))
 myfoldchange <- function(log2) {
   meandflog2 <- mean_function(log2)
   log2fc <- function(x,y) {
@@ -219,7 +218,7 @@ myfoldchange <- function(log2) {
 #' @return foldchange matrix for each method
 #' @export
 #'
-#' @examples myfoldchange_unpaired(log2)
+#' @examples myfoldchange_unpaired(head(log2))
 myfoldchange_unpaired <- function(log2) {
   meandflog2 <- mean_function(log2)
   meandf <- reshape2::melt(meandflog2, id.vars = "name")
@@ -409,15 +408,15 @@ volcano_all <- function(ttest, foldc, datamined, binarycol, threshold=5, namefil
 #' @return exploratory plots from ggpairs
 #' @export
 #'
-#' @examples ggpairs_proteomics(log2, datamined, "Groups.of.TM")
+#' @examples ggpairs_proteomics(head(log2), head(datamined), "Groups.of.TM")
 ggpairs_proteomics <- function(log2, datamined, column2highlight) {
   meanmethods <- mean_function(log2)
   data2highlight <- subset(datamined, select=c("name", column2highlight))
   data2plot <- merge(meanmethods, data2highlight, by="name")
   data2plot$name <- NULL
   plottitle <- paste0("Exploratory graphs of the data, colored by: ", column2highlight)
-  GGally::ggpairs(data2plot, ggplot2::aes(color=!!rlang::sym(column2highlight), alpha = 0.5), upper = list(continuous = GGally::wrap("cor", size = 2)),
-                  title=plottitle) + ggplot2::theme(axis.text = element_text(size = 8))
+  GGally::ggpairs(data2plot, ggplot2::aes(color=!!rlang::sym(column2highlight), alpha = 0.5), upper = list(continuous = GGally::wrap("cor", size = 4)),
+                  title=plottitle) + ggplot2::theme(axis.text = element_text(size = 10))
 }
 
 #' create a dotplot colored by Zscore and sized by the percent of abundance
@@ -472,7 +471,7 @@ dotplot_by_methods <- function(logicaltable, log2, mean_computing=TRUE, saveplot
 #' @return ttest matrix of each method
 #' @export
 #' @import stats
-#' @examples compute_ttest(log2)
+#' @examples compute_ttest(head(log2))
 compute_ttest <- function(df, padj="fdr") {
   df <- replicates_factor(df)
   vectormethod <- sort(unique(df$Method))
@@ -502,7 +501,7 @@ compute_ttest <- function(df, padj="fdr") {
 #' @return mean differences matrix
 #' @export
 #'
-#' @examples compute_meandiff_methods(log2)
+#' @examples compute_meandiff_methods(head(log2))
 compute_meandiff_methods <- function(df) {
   df <- replicates_factor(df)
   vectormethod <- sort(unique(df$Method))
@@ -650,7 +649,7 @@ dotratio <- function(logicaltable, log2, mean_computing=TRUE, saveplot=FALSE, na
 #' @return anova output matrix
 #' @export
 #'
-#' @examples anova_analysis(log2)
+#' @examples anova_analysis(head(log2))
 anova_analysis <- function(log2) {
   long <- replicates_factor(log2)
   proteins <- unique(long$name)
@@ -676,7 +675,7 @@ anova_analysis <- function(log2) {
 #' @importFrom dplyr select
 #' @importFrom tidyr pivot_wider
 #'
-#' @examples lm_analysis(log2)
+#' @examples lm_analysis(head(log2))
 lm_analysis <- function(log2) {
   long <- replicates_factor(log2)
   proteins <- unique(long$name)
@@ -689,7 +688,8 @@ lm_analysis <- function(log2) {
     method_details <- data.frame(
       Method = rownames(method_coefficients),
       Estimate = method_coefficients[, "Estimate"],
-      PValue = method_coefficients[, "Pr(>|t|)"]
+      PValue = method_coefficients[, "Pr(>|t|)"],
+      row.names = NULL
     )
     protein_summary <- data.frame(
       name = protein,
@@ -697,7 +697,8 @@ lm_analysis <- function(log2) {
       RSquared = output_table$r.squared,
       AdjustedRSquared = output_table$adj.r.squared,
       FStatistic = output_table$fstatistic[1],
-      FPValue = pf(output_table$fstatistic[1], output_table$fstatistic[2], output_table$fstatistic[3], lower.tail = FALSE)
+      FPValue = pf(output_table$fstatistic[1], output_table$fstatistic[2], output_table$fstatistic[3], lower.tail = FALSE),
+      row.names = NULL
     )
     combined_details <- cbind(protein_summary, method_details)
     results_list[[protein]] <- combined_details
@@ -710,5 +711,10 @@ lm_analysis <- function(log2) {
       names_glue = "{Method}_{.value}"
     ) %>%
     dplyr::select(name, starts_with("Method"), everything())
-  return(output_wide)
+
+  # Removing "Method" from column names
+  output_wide <- as.data.frame(output_wide)
+  colnames(output_wide) <- gsub("Method", "", colnames(output_wide))
+  rownames(output_wide) <- output_wide$name
+  return(output_wide[,-1])
 }
